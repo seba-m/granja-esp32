@@ -1,25 +1,28 @@
 #include <Arduino.h>
 
+#include <settings.h>
+#include <communication/mqtt_manager.cpp>
+
 class TurbiditySensor
 {
     private:
-        int pin;
         unsigned long timepoint = 0;
+        MqttManager &mqttManager;
 
     public:
-        void setup(int sensorPin)
+        TurbiditySensor(MqttManager &manager) : mqttManager(manager)
         {
-            pin = sensorPin;
         }
-
         void loop(unsigned int timeout = 100U)
         {
             if (millis() - timepoint > timeout)
             {
                 timepoint = millis();
-                int sensorValue = analogRead(pin);
+                int sensorValue = analogRead(turbiditySensorPin);
                 Serial.print("Turbidity value= ");
                 Serial.println(sensorValue, DEC);
+
+                mqttManager.publish("sensor/turbidity", String(sensorValue));
             }
         }
 };

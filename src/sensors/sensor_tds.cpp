@@ -1,5 +1,8 @@
 #include <Arduino.h>
 
+#include <settings.h>
+#include <communication/mqtt_manager.cpp>
+
 #define VREF 5.0          // analog reference voltage(Volt) of the ADC
 #define SCOUNT 30         // sum of sample point
 
@@ -14,12 +17,15 @@ class MeasureTDS
         unsigned long analogSampleTimepoint = 0;
         unsigned long printTimepoint = 0;
 
-        int TdsSensorPin = 0;
+        MqttManager &mqttManager;
 
     public:
-        void setup(int TdsSensorPin)
+        MeasureTDS(MqttManager &manager) : mqttManager(manager)
         {
-            this->TdsSensorPin = TdsSensorPin;
+        }
+
+        void setup()
+        {
             pinMode(TdsSensorPin, INPUT);
         }
 
@@ -56,8 +62,10 @@ class MeasureTDS
                 tdsValue = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge - 255.86 * compensationVolatge * compensationVolatge + 857.39 * compensationVolatge) * 0.5;
 
                 Serial.print("TDS Value:");
-                Serial.print(tdsValue, 0);
+                Serial.print(tdsValue, DEC);
                 Serial.println("ppm");
+
+                mqttManager.publish("sensor/tds", String(tdsValue));
             }
         }
 

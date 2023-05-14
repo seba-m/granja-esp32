@@ -1,16 +1,23 @@
 #include <Arduino.h>
 
+#include <settings.h>
+#include <communication/mqtt_manager.cpp>
+
 class WaterLevelSensor
 {
     private:
-        int pin;
         unsigned long timepoint = 0;
+        
+        MqttManager &mqttManager;
 
     public:
-        void setup(int sensorPin)
+        WaterLevelSensor(MqttManager &manager) : mqttManager(manager)
         {
-            pin = sensorPin;
-            pinMode(pin, INPUT);
+        }
+
+        void setup()
+        {
+            pinMode(waterLevelSensorPin, INPUT);
         }
 
         void loop(unsigned int timeout = 500U)
@@ -18,9 +25,11 @@ class WaterLevelSensor
             if (millis() - timepoint > timeout)
             {
                 timepoint = millis();
-                int liquidLevel = digitalRead(pin);
+                int liquidLevel = digitalRead(waterLevelSensorPin);
                 Serial.print("Liquid_level= ");
                 Serial.println(liquidLevel, DEC);
+
+                mqttManager.publish("sensor/level", String(liquidLevel));
             }
         }
 };

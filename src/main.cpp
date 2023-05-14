@@ -1,32 +1,40 @@
 #include <Arduino.h>
 #include <Wire.h>
+
 #include <sensors/sensor_tds.cpp>
 #include <sensors/sensor_water_level.cpp>
 #include <sensors/sensor_turbidity.cpp>
 #include <sensors/sensor_temperature.cpp>
 
-#define waterLevelSensorPin 5
-#define turbiditySensorPin 6
-#define TdsSensorPin 7
-#define temperatureSensorPin 8
+#include <communication/mqtt_manager.cpp>
 
-MeasureTDS measureTDS;
-WaterLevelSensor waterLevelSensor;
-TurbiditySensor turbiditySensor;
-TemperatureSensor temperatureSensor;
+MqttManager mqttManager;
+
+MeasureTDS measureTDS = MeasureTDS(mqttManager);
+WaterLevelSensor waterLevelSensor = WaterLevelSensor(mqttManager);
+TurbiditySensor turbiditySensor = TurbiditySensor(mqttManager);
+TemperatureSensor temperatureSensor = TemperatureSensor(mqttManager);
 
 void setup()
 {
-    measureTDS.setup(TdsSensorPin);
-    waterLevelSensor.setup(waterLevelSensorPin);
-    turbiditySensor.setup(turbiditySensorPin);
-    temperatureSensor.setup(temperatureSensorPin);
+    Serial.begin(9600);
+    // mqtt configuration
+    mqttManager.setup();
+
+    // sensors configuration
+    //measureTDS.setup();
+    //waterLevelSensor.setup();
+    //temperatureSensor.setup();
 }
 
 void loop()
 {
-    measureTDS.loop();
-    waterLevelSensor.loop();
-    turbiditySensor.loop();
-    temperatureSensor.loop();
+    // mqtt loop
+    mqttManager.loop();
+
+    // sensors loop
+    //measureTDS.loop();
+    //waterLevelSensor.loop();
+    //turbiditySensor.loop();
+    //temperatureSensor.loop();
 }

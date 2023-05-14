@@ -1,17 +1,23 @@
 #include <OneWire.h>
 
+#include <settings.h>
+#include <communication/mqtt_manager.cpp>
+
 class TemperatureSensor
 {
     private:
-        int sensorPin;
         OneWire ds;
         unsigned long timepoint = 0;
+        MqttManager &mqttManager;
 
     public:
-        void setup(int pin)
+        TemperatureSensor(MqttManager &manager) : mqttManager(manager)
         {
-            sensorPin = pin;
-            ds = OneWire(pin);
+        }
+
+        void setup()
+        {
+            ds = OneWire(temperatureSensorPin);
         }
 
         void loop(unsigned int timeout = 100U)
@@ -22,6 +28,8 @@ class TemperatureSensor
                 float temperature = getTemp();
                 Serial.print("Temperature= ");
                 Serial.println(temperature, DEC);
+
+                mqttManager.publish("sensor/temperature", String(temperature));
             }
         }
 
