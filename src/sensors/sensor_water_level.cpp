@@ -1,11 +1,26 @@
-int Liquid_level = 0;
-void setup() {
-  Serial.begin(9600);
-  pinMode(5, INPUT);
-}
+#include <Arduino.h>
 
-void loop() {
-  Liquid_level = digitalRead(5);
-  Serial.print("Liquid_level= "); Serial.println(Liquid_level, DEC);
-  delay(500);
-}
+class WaterLevelSensor
+{
+    private:
+        int pin;
+        unsigned long timepoint = 0;
+
+    public:
+        void setup(int sensorPin)
+        {
+            pin = sensorPin;
+            pinMode(pin, INPUT);
+        }
+
+        void loop(unsigned int timeout = 500U)
+        {
+            if (millis() - timepoint > timeout)
+            {
+                timepoint = millis();
+                int liquidLevel = digitalRead(pin);
+                Serial.print("Liquid_level= ");
+                Serial.println(liquidLevel, DEC);
+            }
+        }
+};
