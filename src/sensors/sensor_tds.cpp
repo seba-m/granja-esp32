@@ -3,13 +3,13 @@
 #include <settings.h>
 #include <communication/mqtt_manager.cpp>
 
-#define VREF 5.0          // analog reference voltage(Volt) of the ADC
-#define SCOUNT 30         // sum of sample point
+#define VREF 5.0
+#define SCOUNT 30
 
 class MeasureTDS
 {
     private:
-        int analogBuffer[SCOUNT]; // store the analog value in the array, read from ADC
+        int analogBuffer[SCOUNT];
         int analogBufferTemp[SCOUNT];
         int analogBufferIndex = 0, copyIndex = 0;
         float averageVoltage = 0, tdsValue = 0, temperature = 25;
@@ -26,11 +26,17 @@ class MeasureTDS
 
         void setup()
         {
+            if (TdsSensorPin < 0)
+                return;
+
             pinMode(TdsSensorPin, INPUT);
         }
 
         void loop()
         {
+            if (TdsSensorPin < 0)
+                return;
+
             readAnalogValue();
             printTDSValue();
         }
@@ -61,9 +67,12 @@ class MeasureTDS
                 float compensationVolatge = averageVoltage / compensationCoefficient;
                 tdsValue = (133.42 * compensationVolatge * compensationVolatge * compensationVolatge - 255.86 * compensationVolatge * compensationVolatge + 857.39 * compensationVolatge) * 0.5;
 
-                Serial.print("TDS Value:");
-                Serial.print(tdsValue, DEC);
-                Serial.println("ppm");
+                if (log_enabled)
+                {
+                    Serial.print("TDS Value = ");
+                    Serial.print(tdsValue, DEC);
+                    Serial.println("ppm");
+                }
 
                 mqttManager.publish("sensor/tds", String(tdsValue));
             }

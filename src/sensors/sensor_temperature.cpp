@@ -19,14 +19,19 @@ class TemperatureSensor
 
         void setup()
         {
+            if (temperatureSensorPin < 0)
+                return;
+
             ds = OneWire(temperatureSensorPin);
             sensors.setOneWire(&ourWire);
             sensors.begin();
-            sensors.setResolution(12); // Ajusta la resolución del sensor a 12 bits (máxima precisión)
         }
 
         void loop(unsigned int timeout = 500U)
         {
+            if (temperatureSensorPin < 0)
+                return;
+
             if (millis() - timepoint > timeout)
             {
                 timepoint = millis();
@@ -35,13 +40,17 @@ class TemperatureSensor
 
                 if (temp == -127.00)
                 {
-                    Serial.println("Error: Lectura inválida del sensor");
+                    if (log_enabled)
+                        Serial.println("Error: Could not read temperature data");
                     return;
                 }
 
-                Serial.print("Temperatura = ");
-                Serial.print(temp);
-                Serial.println(" °C");
+                if (log_enabled)
+                {
+                    Serial.print("Temperature = ");
+                    Serial.print(temp);
+                    Serial.println(" °C");
+                }
 
                 mqttManager.publish("sensor/temperature", String(temp));
             }

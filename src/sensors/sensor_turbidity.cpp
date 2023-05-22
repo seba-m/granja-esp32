@@ -15,12 +15,19 @@ class TurbiditySensor
         }
         void loop(unsigned int timeout = 100U)
         {
+            if (turbiditySensorPin < 0)
+                return;
+
             if (millis() - timepoint > timeout)
             {
                 timepoint = millis();
                 int sensorValue = analogRead(turbiditySensorPin);
-                Serial.print("Turbidity value= ");
-                Serial.println(sensorValue, DEC);
+
+                if (log_enabled)
+                {
+                    Serial.print("Turbidity value= ");
+                    Serial.println(sensorValue, DEC);
+                }
 
                 mqttManager.publish("sensor/turbidity", String(sensorValue));
             }
