@@ -1,43 +1,36 @@
-#include <Arduino.h>
+#include <sensors/sensor_water_level.h>
 
-#include <settings.h>
-#include <communication/mqtt_manager.cpp>
+WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager) {}
 
-class WaterLevelSensor
+void WaterLevelSensor::setup()
 {
-    private:
-        unsigned long timepoint = 0;
-        MqttManager &mqttManager;
+    if (waterLevelSensorPin < 0)
+        return;
 
-    public:
-        WaterLevelSensor(MqttManager &manager) : mqttManager(manager)
+    pinMode(waterLevelSensorPin, INPUT);
+}
+
+void WaterLevelSensor::loop(unsigned int timeout)
+{
+    if (waterLevelSensorPin < 0)
+        return;
+
+    if (millis() - timepoint > timeout)
+    {
+        timepoint = millis();
+        int liquidLevel = digitalRead(waterLevelSensorPin);
+
+        if (log_enabled)
         {
+            Serial.print("Liquid level= ");
+            Serial.println(liquidLevel, DEC);
         }
 
-        void setup()
-        {
-            if (waterLevelSensorPin < 0)
-                return;
+        mqttManager.publish(mqtt_topic_water_level, String(liquidLevel));
+    }
+}
 
-            pinMode(waterLevelSensorPin, INPUT);
-        }
-
-        void loop(unsigned int timeout = 500U)
-        {
-            if (waterLevelSensorPin < 0)
-                return;
-
-            if (millis() - timepoint > timeout)
-            {
-                timepoint = millis();
-                int liquidLevel = digitalRead(waterLevelSensorPin);
-
-                if (log_enabled) {
-                    Serial.print("Liquid level= ");
-                    Serial.println(liquidLevel, DEC);
-                }
-                
-                mqttManager.publish("sensor/level", String(liquidLevel));
-            }
-        }
-};
+void WaterLevelSensor::update()
+{
+    // No se necesita implementar nada aquí para este ejemplo
+}

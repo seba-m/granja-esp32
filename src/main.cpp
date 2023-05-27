@@ -2,21 +2,25 @@
 #include <Wire.h>
 #include <settings.h>
 
-#include <sensors/sensor_tds.cpp>
-#include <sensors/sensor_water_level.cpp>
-#include <sensors/sensor_turbidity.cpp>
-#include <sensors/sensor_temperature.cpp>
-#include <sensors/sensor_dht.cpp>
+#include <sensors/sensor_tds.h>
+#include <sensors/sensor_water_level.h>
+#include <sensors/sensor_turbidity.h>
+#include <sensors/sensor_temperature.h>
+#include <sensors/sensor_dht.h>
 
-#include <communication/mqtt_manager.cpp>
+#include <actuators/pump.h>
+
+#include <communication/mqtt_manager.h>
+
+PumpController controller;
 
 MqttManager mqttManager;
 
-MeasureTDS measureTDS = MeasureTDS(mqttManager);
-WaterLevelSensor waterLevelSensor = WaterLevelSensor(mqttManager);
-TurbiditySensor turbiditySensor = TurbiditySensor(mqttManager);
-TemperatureSensor temperatureSensor = TemperatureSensor(mqttManager);
-DHTSensor dhtSensor = DHTSensor(mqttManager);
+MeasureTDS measureTDS(mqttManager);
+WaterLevelSensor waterLevelSensor(mqttManager);
+TurbiditySensor turbiditySensor(mqttManager);
+TemperatureSensor temperatureSensor(mqttManager);
+DHTSensor dhtSensor(mqttManager);
 
 void setup()
 {
@@ -24,6 +28,12 @@ void setup()
 
     // mqtt configuration
     mqttManager.setup();
+
+    mqttManager.attach(&dhtSensor);
+    mqttManager.attach(&measureTDS);
+    mqttManager.attach(&waterLevelSensor);
+    mqttManager.attach(&turbiditySensor);
+    mqttManager.attach(&temperatureSensor);
 
     // sensors configuration
     measureTDS.setup();

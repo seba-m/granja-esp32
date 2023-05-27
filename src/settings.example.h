@@ -18,12 +18,26 @@ CONFIGURACIÓN DE LOS SENSORES
 #define dhtSensorPin -1         // Pin utilizado para el sensor de humedad y temperatura DHT
 #define dhtSensorType DHT22     // Tipo de sensor DHT (DHT11 o DHT22)
 
-
+/**************************************************************
+CONFIGURACIÓN DE LOS ACTUADORES
+    Descripción:
+        - Este bloque de código permite configurar los actuadores utilizados en el sistema.
+        - Los actuadores pueden ser activados o desactivados mediante la asignación de
+        un valor al pin correspondiente.
+    Instrucciones:
+        - Para desactivar un actuador, establece el valor -1 en el pin del actuador.
+        - Para activar un actuador, establece un valor mayor a 0 en el pin del actuador,
+        donde el valor representa el número de pin utilizado por el actuador.
+**************************************************************/
+#define pump_enabled true // DESACTIVAR (false) SOLO PARA PRUEBAS
+#define pumpEnaPin 6      // Pin utilizado para la bomba de agua
+#define pumpIn1Pin 7      // Pin utilizado para la bomba de agua (definido)
+#define pumpIn2Pin 8      // Pin utilizado para la bomba de agua (definido)
 
 /**************************************************************
 CONFIGURACIÓN DEL WIFI
     Aviso:
-        Si se activa la conexión WiFi, se desactiva la con el broker MQTT.
+        Si se desactiva la conexión WiFi, se desactiva la conexión con el broker MQTT.
     Descripción:
         Este bloque de código permite configurar los parámetros de conexión WiFi.
     Instrucciones:
@@ -33,12 +47,10 @@ CONFIGURACIÓN DEL WIFI
 #define wifi_ssid "your_wifi_name"          // SSID (nombre) de tu red WiFi
 #define wifi_password "your_wifi_password"  // Contraseña de tu red WiFi
 
-
-
 /**************************************************************
 CONFIGURACIÓN DEL BROKER MQTT
     Aviso:
-        Si se activa la conexión con el broker MQTT, se desactiva la conexión WiFi.
+        Si se desactiva la conexión con el broker MQTT, se desactiva la conexión WiFi.
     Descripción:
         Este bloque de código permite configurar la conexión con el broker MQTT.
     Instrucciones:
@@ -50,7 +62,23 @@ CONFIGURACIÓN DEL BROKER MQTT
 #define mqtt_user "your_mqtt_user"          // Nombre de usuario para la autenticación en el broker MQTT
 #define mqtt_password "your_mqtt_password"  // Contraseña para la autenticación en el broker MQTT
 
+/**************************************************************
+CONFIGURACIÓN DE LOS TOPICS MQTT
+    Aviso:
+        Solo funcionara si se ha configurado la conexión con el broker MQTT.
+    Descripción:
+        Este bloque de código permite configurar los topics MQTT utilizados en el sistema.
+    Instrucciones:
+        Completa los campos con los datos correspondientes a tu broker MQTT.
+**************************************************************/
+#define mqtt_topic_water_level "sensor/water_level"             // Topic MQTT para el sensor de nivel de agua
+#define mqtt_topic_turbidity "sensor/turbidity"                 // Topic MQTT para el sensor de turbidez
+#define mqtt_topic_water_temperature "sensor/water_temperature" // Topic MQTT para el sensor de temperatura del agua
+#define mqtt_topic_tds "sensor/tds"                             // Topic MQTT para el sensor de TDS (Total Dissolved Solids)
+#define mqtt_topic_dht_temperature "sensor/ambient_temperature" // Topic MQTT para el sensor de DHT (temperatura ambiente)
+#define mqtt_topic_dht_humidity "sensor/ambient_humidity"       // Topic MQTT para el sensor de DHT (humedad ambiente)
 
+#define mqtt_topic_pump "actuator/pump"                         // Topic MQTT para la bomba de agua
 
 /**************************************************************
 CONFIGURACIÓN DEL REGISTRO (LOGS)
