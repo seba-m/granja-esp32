@@ -172,4 +172,38 @@ void MqttManager::reconnect()
     }
 }
 
+void MqttManager::handleSensorAction(Device *device, StaticJsonDocument<200> value)
+{
+    Sensor *sensor = (Sensor *)device;
+    
+    String command = value["command"];
+    
+    if (command == "enable")
+    {
+        sensor->enable();
+    } else if (command == "disable")
+    {
+        sensor->disable();
+    } else if (command == "setPin")
+    {
+        int pin = value["pin"];
+        sensor->setPin(pin);
+    } 
+    //TODO: add other commands
+    /* else if (command == "setInterval")
+     {
+         int interval = value["interval"];
+         sensor->setInterval(interval);
+     } else if (command == "setTopic")
+     {
+         const char *topic = value["topic"];
+         sensor->setTopic(topic);
+     }*/
+}
+
+void MqttManager::handleActuatorAction(Device *device, StaticJsonDocument<200> value)
+{
+    Actuator *actuator = (Actuator *)device;
+}
+
 #endif

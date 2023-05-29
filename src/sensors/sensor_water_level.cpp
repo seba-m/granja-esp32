@@ -1,7 +1,7 @@
 #include <sensors/sensor_water_level.h>
 
 WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager), Sensor(waterLevelSensorPin) {
-    setTopicName("water_level");
+    setDeviceName("water_level");
 }
 
 void WaterLevelSensor::setup()

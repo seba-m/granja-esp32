@@ -17,8 +17,7 @@ class Sensor : public Device
     public:
         Sensor(int pin)
         {
-            this->pin = pin;
-            setValidPins(pin > -1);
+            setPin(pin);
         }
 
         void setValue(String type, float value)
@@ -44,6 +43,12 @@ class Sensor : public Device
         int getPin()
         {
             return this->pin;
+        }
+
+        void setPin(int pin)
+        {
+            this->pin = pin;
+            setValidPins(pin > -1);
         }
 
         virtual void readSensorValue() = 0;

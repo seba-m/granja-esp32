@@ -8,6 +8,9 @@
 #include <settings.h>
 
 #include <observer/subject.h>
+#include <device.h>
+#include <actuators/actuator.h>
+#include <sensors/sensor.h>
 
 class MqttManager : public Subject
 {
@@ -15,7 +18,7 @@ class MqttManager : public Subject
         WiFiClient wifiClient;
         PubSubClient client;
         const char *espId;
-        std::vector<MqttObserver*> observers;
+        std::vector<Device*> observers;
 
     public:
         MqttManager();
@@ -24,12 +27,12 @@ class MqttManager : public Subject
         void loop();
         void publish(const char *topic, StaticJsonDocument<200> & message);
 
-        void attach(MqttObserver *observer) override
+        void attach(Device *observer) override
         {
             observers.push_back(observer);
         }
 
-        void detach(MqttObserver *observer) override
+        void detach(Device *observer) override
         {
             // Buscar y eliminar el observador de la lista
             auto it = std::find(observers.begin(), observers.end(), observer);
@@ -65,46 +68,33 @@ class MqttManager : public Subject
             }
 
             StaticJsonDocument<200> doc;
-            deserializeJson(doc, message);
+            DeserializationError error = deserializeJson(doc, message);
+            if (error) return;
 
-            String command = doc["command"];
-            String sensorId = doc["sensor"];
-            String value = doc["value"];
+            String owner = doc["owner"];
+            String type = doc["type"];
+            String name = doc["name"];
 
-            /*if (command == "set")
-            {
-                MqttObserver *sensor = getSensor(sensorId);
-                sensor->setEnabled(value == "true");
-                sensor.loop();
-            }
-            /*else if (command == "get")
-            {
-                if (sensor == "water_level")
-                {
-                    publish(mqtt_topic_water_level, String(waterLevelSensor->isEnabled()));
-                }
-                else if (sensor == "water_pump")
-                {
-                    publish(mqtt_topic_water_pump, String(waterPump->isEnabled()));
-                }
-                else if (sensor == "light")
-                {
-                    publish(mqtt_topic_light, String(light->isEnabled()));
-                }
-            }*/
-            /*for (auto observer : observers)
-            {
-                observer->update();
-            }*/
+            if (owner != espId) return; //check if message is for this device
+
+            Device *device = getDevice(name);
+
+            if (device == nullptr) return;
+
+            if (type == "sensor")
+                handleSensorAction(device, doc);
+            else if (type == "actuator")
+                handleActuatorAction(device, doc);
         }
 
-        /*MqttObserver *getSensor(String sensorId) {
-            auto it = std::find_if(observers.begin(), observers.end(), [sensorId](MqttObserver *observer) {
-                return observer->getTopicName() == sensorId;
+        Device *getDevice(String deviceName)
+        {
+            auto it = std::find_if(observers.begin(), observers.end(), [deviceName](Device *observer) {
+                return observer->getDeviceName() == deviceName;
             });
 
             return *it;
-        }*/
+        }
 
     private:
         static bool isValidWifi();
@@ -113,6 +103,8 @@ class MqttManager : public Subject
         void connectWiFi();
         void connectMQTT();
         void reconnect();
+        void handleSensorAction(Device *device, StaticJsonDocument<200> value);
+        void handleActuatorAction(Device *device, StaticJsonDocument<200> value);
 };
 
 #endif // mqtt_manager_h

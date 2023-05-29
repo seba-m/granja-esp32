@@ -1,7 +1,7 @@
 #include <sensors/sensor_turbidity.h>
 
 TurbiditySensor::TurbiditySensor(MqttManager &manager) : mqttManager(manager), Sensor(turbiditySensorPin) {
-    setTopicName("turbidity");
+    setDeviceName("turbidity");
 }
 
 void TurbiditySensor::loop(unsigned int timeout)

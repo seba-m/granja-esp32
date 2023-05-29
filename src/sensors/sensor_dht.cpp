@@ -2,7 +2,7 @@
 #include <status.h>
 
 DHTSensor::DHTSensor(MqttManager &manager) : mqttManager(manager), Sensor(dhtSensorPin) {
-    setTopicName("dht");
+    setDeviceName("dht");
 }
 
 DHTSensor::~DHTSensor()
@@ -29,19 +29,20 @@ void DHTSensor::setup()
 
 void DHTSensor::loop(unsigned int timeout)
 {
-    if (!isValidPins() || !isEnabled())
-    {
-        if (isEnabled() && log_enabled)
-        {
-            Serial.println("Invalid pins");
-            this->setStatus(SensorStatus::InvalidPins);
-        }
-        return;
-    }
-
     if (millis() - timepoint > timeout)
     {
         timepoint = millis();
+
+        if (!isValidPins() || !isEnabled())
+        {
+            if (isEnabled() && log_enabled)
+            {
+                Serial.println("Invalid pins");
+                this->setStatus(SensorStatus::InvalidPins);
+            }
+            return;
+        }
+
         readSensorValue();
         publish();
         this->setStatus(SensorStatus::OkLoop);

@@ -1,7 +1,7 @@
 #include <sensors/sensor_tds.h>
 
 MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor(TdsSensorPin) {
-    setTopicName("tds");
+    setDeviceName("tds");
 }
 
 void MeasureTDS::setup()
@@ -75,6 +75,7 @@ void MeasureTDS::publish()
     }
 
     StaticJsonDocument<200> doc;
+    doc["type"] = "sensor";
     doc["sensor"] = "tds";
     doc["tds"] = tdsValue;
     doc["status"] = this->getStatus();
@@ -91,7 +92,7 @@ void MeasureTDS::readAnalogValue(unsigned int timeout)
         analogBufferIndex++;
         if (analogBufferIndex == SCOUNT)
             analogBufferIndex = 0;
-    }
+    } 
 }
 
 void MeasureTDS::printTDSValue(unsigned int timeout)

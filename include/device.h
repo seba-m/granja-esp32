@@ -6,9 +6,9 @@
 class Device
 {
     private:
-        bool enabled = true;
+        bool enabled = false;
         bool validPins = true;
-        String topicName = "";
+        String deviceName = "";
 
     public:
         void setValidPins(bool validPins)
@@ -31,9 +31,9 @@ class Device
             this->enabled = false;
         }
 
-        void setTopicName(String topicName)
+        void setDeviceName(String deviceName)
         {
-            this->topicName = topicName;
+            this->deviceName = deviceName;
         }
 
         bool isEnabled()
@@ -41,9 +41,9 @@ class Device
             return this->enabled;
         }
 
-        String getTopicName()
+        String getDeviceName()
         {
-            return this->topicName;
+            return this->deviceName;
         }
 };
 

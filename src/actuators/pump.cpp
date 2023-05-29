@@ -7,7 +7,7 @@ PumpController::PumpController()
         {pumpIn2Pin, "IN2"}
     })
 {
-    setTopicName("pump");
+    setDeviceName("pump");
 }
 
 void PumpController::setup()
@@ -51,10 +51,5 @@ void PumpController::turnOff()
 
 void PumpController::update()
 {
-    if (getState())
-    {
-        turnOff();
-    } else {
-        turnOn();
-    }
+    // TODO: implement update
 }

@@ -26,6 +26,8 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial.println("Starting...");
+
     // mqtt configuration
     mqttManager.setup();
 
@@ -40,6 +42,8 @@ void setup()
     waterLevelSensor.setup();
     temperatureSensor.setup();
     dhtSensor.setup();
+
+    Serial.println("Started");
 }
 
 void loop()
