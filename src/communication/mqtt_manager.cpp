@@ -184,26 +184,47 @@ void MqttManager::handleSensorAction(Device *device, StaticJsonDocument<200> val
     } else if (command == "disable")
     {
         sensor->disable();
-    } else if (command == "setPin")
+    } else if (command == "set_pin")
     {
         int pin = value["pin"];
         sensor->setPin(pin);
-    } 
+        //TODO: check if pin wont be used by other sensor
+    } else if (command == "set_name")
+    {
+        const char *topic = value["new_name"];
+        sensor->setDeviceName(topic);
+    }
     //TODO: add other commands
-    /* else if (command == "setInterval")
-     {
-         int interval = value["interval"];
-         sensor->setInterval(interval);
-     } else if (command == "setTopic")
-     {
-         const char *topic = value["topic"];
-         sensor->setTopic(topic);
-     }*/
 }
 
 void MqttManager::handleActuatorAction(Device *device, StaticJsonDocument<200> value)
 {
     Actuator *actuator = (Actuator *)device;
+
+    String command = value["command"];
+
+    if (command == "enable")
+    {
+        actuator->enable();
+    } else if (command == "disable")
+    {
+        actuator->disable();
+    } else if (command == "turn_on") 
+    {
+        int time = value["time"];
+        actuator->turnOn(time);
+    } else if (command == "turn_off")
+    {
+        actuator->turnOff();
+    } else if (command == "set_pin")
+    {
+        std::map<int, String> pins = value["pins"];
+        actuator->setPins(pins);
+    } else if (command == "set_name")
+    {
+        const char *topic = value["new_name"];
+        actuator->setDeviceName(topic);
+    }
 }
 
 #endif

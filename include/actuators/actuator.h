@@ -38,6 +38,11 @@ class Actuator : public Device
             return this->state;
         }
 
+        void setPins(std::map<int, String> pins)
+        {
+            this->pins = pins;
+        }
+
         std::map<int, String> getPins()
         {
             return this->pins;

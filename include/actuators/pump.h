@@ -12,7 +12,7 @@ class PumpController : public MqttObserver, public Actuator
     public:
         PumpController();
         void setup();
-        void turnOn(int seconds) override;
+        void turnOn(int seconds = 10) override;
         void turnOff() override;
         void update() override;
 };

@@ -20,7 +20,7 @@ void PumpController::setup()
     }
 }
 
-void PumpController::turnOn(int seconds = 10)
+void PumpController::turnOn(int seconds)
 {
     if (getState() || !isEnabled() || !isValidPins()) return;
 
