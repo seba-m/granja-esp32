@@ -7,4 +7,4 @@ class MqttObserver
         virtual void update() = 0;
 };
 
-#endif
+#endif // observer_h

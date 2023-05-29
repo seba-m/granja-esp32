@@ -1,22 +1,85 @@
 #include <sensors/sensor_tds.h>
 
-MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager) {}
+MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor(TdsSensorPin) {
+    setTopicName("tds");
+}
 
 void MeasureTDS::setup()
 {
-    if (TdsSensorPin < 0)
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
         return;
+    }
 
     pinMode(TdsSensorPin, INPUT);
+    this->setStatus(SensorStatus::OkSetup);
 }
 
 void MeasureTDS::loop()
 {
-    if (TdsSensorPin < 0)
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
         return;
+    }
+
+    readSensorValue();
+}
+
+void MeasureTDS::readSensorValue()
+{
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
+        return;
+    }
 
     readAnalogValue();
     printTDSValue();
+    this->setStatus(SensorStatus::OkLoop);
+}
+
+void MeasureTDS::publish()
+{
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
+        return;
+    }
+
+    float tdsValue = getValue("tds");
+
+    if (isnan(tdsValue))
+    {
+        if (log_enabled)
+            Serial.println("Failed to read from TDS sensor!");
+        this->setStatus(SensorStatus::FailedRead);
+        return;
+    }
+
+    StaticJsonDocument<200> doc;
+    doc["sensor"] = "tds";
+    doc["tds"] = tdsValue;
+    doc["status"] = this->getStatus();
+
+    mqttManager.publish(mqtt_topic_tds, doc);
 }
 
 void MeasureTDS::readAnalogValue(unsigned int timeout)
@@ -51,7 +114,9 @@ void MeasureTDS::printTDSValue(unsigned int timeout)
             Serial.println("ppm");
         }
 
-        mqttManager.publish(mqtt_topic_tds, String(tdsValue));
+        setValue("tds", tdsValue);
+        this->setStatus(SensorStatus::OkRead);
+        publish();
     }
 }
 
@@ -82,5 +147,5 @@ int MeasureTDS::getMedianNum(int bArray[], int iFilterLen)
 
 void MeasureTDS::update()
 {
-    // Agrega aquí la lógica para manejar cambios en la conexión MQTT
+    // TODO: implement update
 }

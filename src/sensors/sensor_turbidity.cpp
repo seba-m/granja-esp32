@@ -1,28 +1,94 @@
 #include <sensors/sensor_turbidity.h>
 
-TurbiditySensor::TurbiditySensor(MqttManager &manager) : mqttManager(manager) {}
+TurbiditySensor::TurbiditySensor(MqttManager &manager) : mqttManager(manager), Sensor(turbiditySensorPin) {
+    setTopicName("turbidity");
+}
 
 void TurbiditySensor::loop(unsigned int timeout)
 {
-    if (turbiditySensorPin < 0)
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
         return;
+    }
 
     if (millis() - timepoint > timeout)
     {
         timepoint = millis();
-        int sensorValue = analogRead(turbiditySensorPin);
+        readSensorValue();
+        publish();
+        this->setStatus(SensorStatus::OkLoop);
+    }
+}
 
+void TurbiditySensor::publish()
+{
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
+        return;
+    }
+
+    float turbidity = getValue("turbidity");
+
+    if (isnan(turbidity))
+    {
         if (log_enabled)
         {
-            Serial.print("Turbidity value = ");
-            Serial.println(sensorValue, DEC);
+            Serial.println("Failed to read from turbidity sensor!");
         }
-
-        mqttManager.publish(mqtt_topic_turbidity, String(sensorValue));
+        this->setStatus(SensorStatus::FailedRead);
+        return;
     }
+
+    if (log_enabled)
+    {
+        Serial.print("Turbidity: ");
+        Serial.println(turbidity);
+    }
+
+    StaticJsonDocument<200> doc;
+    doc["type"] = "sensor";
+    doc["sensor"] = "turbidity";
+    doc["turbidity"] = turbidity;
+    doc["status"] = this->getStatus();
+
+    mqttManager.publish(mqtt_topic_turbidity, doc);
+}
+
+void TurbiditySensor::readSensorValue()
+{
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
+        return;
+    }
+
+    int sensorValue = analogRead(turbiditySensorPin);
+
+    if (log_enabled)
+    {
+        Serial.print("Turbidity value = ");
+        Serial.println(sensorValue, DEC);
+    }
+
+    setValue("turbidity", sensorValue);
+    this->setStatus(SensorStatus::OkRead);
 }
 
 void TurbiditySensor::update()
 {
-    // No se necesita implementar nada aquí para este ejemplo
+    //TODO: implement update
 }

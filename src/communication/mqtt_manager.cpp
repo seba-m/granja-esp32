@@ -28,14 +28,16 @@ void MqttManager::loop()
     client.loop();
 }
 
-void MqttManager::publish(const char *topic, String message)
+void MqttManager::publish(const char *topic, StaticJsonDocument <200> &doc)
 {
     if (!isValidMqtt())
     {
         return;
     }
 
-    client.publish(topic, message.c_str());
+    char buffer[200];
+    serializeJson(doc, buffer);
+    client.publish(topic, buffer);
 }
 
 bool MqttManager::isValidWifi()
@@ -46,32 +48,6 @@ bool MqttManager::isValidWifi()
 bool MqttManager::isValidMqtt()
 {
     return isValidWifi() && mqtt_enabled && mqtt_server && mqtt_port && mqtt_user && mqtt_password;
-}
-
-void MqttManager::callback(char *topic, byte *payload, unsigned int length)
-{
-    if (!isValidMqtt())
-    {
-        return;
-    }
-
-    if (log_enabled)
-    {
-        Serial.print("Message arrived in topic: ");
-        Serial.println(topic);
-
-        Serial.print("Message:");
-        char message[length];
-
-        for (int i = 0; i < length; i++)
-        {
-            message[i] = (char)payload[i];
-        }
-
-        Serial.println(message);
-
-        Serial.println("-----------------------");
-    }
 }
 
 const char *MqttManager::getEspId()
@@ -118,7 +94,10 @@ void MqttManager::connectMQTT()
         Serial.println("Connecting to MQTT broker: " + String(mqtt_server) + " ...");
     }
     client.setServer(mqtt_server, mqtt_port);
-    client.setCallback(callback);
+    client.setCallback([this](char *topic, byte *payload, unsigned int length)
+    { 
+        this->notify(topic, payload, length); 
+    });
 
     while (!client.connected())
     {

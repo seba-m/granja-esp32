@@ -5,15 +5,15 @@
 #include <settings.h>
 #include <communication/mqtt_manager.h>
 
-class PumpController : public MqttObserver
-{
-    private:
-        bool isOn = false;
+#include <actuators/actuator.h>
 
+class PumpController : public MqttObserver, public Actuator
+{
     public:
+        PumpController();
         void setup();
-        void turnOn(int seconds = 10);
-        void turnOff();
+        void turnOn(int seconds) override;
+        void turnOff() override;
         void update() override;
 };
 

@@ -4,8 +4,9 @@
 #include <Arduino.h>
 #include <settings.h>
 #include <communication/mqtt_manager.h>
+#include <sensors/sensor.h>
 
-class TurbiditySensor : public MqttObserver
+class TurbiditySensor : public MqttObserver, public Sensor
 {
     private:
         unsigned long timepoint = 0;
@@ -15,6 +16,10 @@ class TurbiditySensor : public MqttObserver
         TurbiditySensor(MqttManager &manager);
         void loop(unsigned int timeout = 100U);
         void update() override;
+        void readSensorValue() override;
+
+    private:
+        void publish() override;
 };
 
 #endif // sensor_turbidity_h

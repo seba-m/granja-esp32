@@ -2,6 +2,7 @@
 #define subject_h
 
 #include <vector>
+#include <unordered_map>
 #include <observer/observer.h>
 
 class Subject

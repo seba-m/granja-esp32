@@ -1,43 +1,60 @@
 #include <actuators/pump.h>
 
-void PumpController::setup()
+PumpController::PumpController() 
+    : Actuator({
+        {pumpEnaPin, "ENA"}, 
+        {pumpIn1Pin, "IN1"}, 
+        {pumpIn2Pin, "IN2"}
+    })
 {
-    pinMode(pumpEnaPin, OUTPUT); // ENA
-    pinMode(pumpIn1Pin, OUTPUT); // IN1
-    pinMode(pumpIn2Pin, OUTPUT); // IN2
+    setTopicName("pump");
 }
 
-void PumpController::turnOn(int seconds)
+void PumpController::setup()
 {
-    if (isOn)
+    if (!isEnabled() || !isValidPins()) return;
+
+    for (auto const pin : getPins())
     {
-        return;
+        pinMode(pin.first, OUTPUT);
     }
+}
 
-    digitalWrite(pumpEnaPin, HIGH); // ENA
-    digitalWrite(pumpIn1Pin, HIGH); // IN1
-    digitalWrite(pumpIn2Pin, LOW);  // IN2
-    isOn = true;
+void PumpController::turnOn(int seconds = 10)
+{
+    if (getState() || !isEnabled() || !isValidPins()) return;
 
+    for (auto const pin : getPins())
+    {
+        if (pin.second == "IN2")
+            digitalWrite(pin.first, LOW);
+        else
+            digitalWrite(pin.first, HIGH);
+    }    
+
+    setState(true);
     delay(seconds * 1000);
-
     turnOff();
 }
 
 void PumpController::turnOff()
 {
-    if (!isOn)
-    {
+    if (!getState() || !isEnabled() || !isValidPins())
         return;
-    }
 
-    digitalWrite(pumpEnaPin, LOW); // ENA
-    digitalWrite(pumpIn1Pin, LOW); // IN1
-    digitalWrite(pumpIn2Pin, LOW); // IN2
-    isOn = false;
+    for (auto const pin : getPins())
+    {
+        digitalWrite(pin.first, LOW);
+    }
+    setState(false);
 }
 
 void PumpController::update()
 {
-    // No se necesita implementar nada aquí para este ejemplo
+    if (getState())
+    {
+        turnOff();
+    } else {
+        turnOn();
+    }
 }
