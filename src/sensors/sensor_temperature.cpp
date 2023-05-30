@@ -17,7 +17,7 @@ void TemperatureSensor::setup()
     }
 
     ds = OneWire(temperatureSensorPin);
-    sensors.setOneWire(&ourWire);
+    sensors.setOneWire(&ds);
     sensors.begin();
     this->setStatus(SensorStatus::OkSetup);
 }

@@ -14,7 +14,6 @@ class TemperatureSensor : public MqttObserver, public Sensor
         OneWire ds;
         unsigned long timepoint = 0;
         MqttManager &mqttManager;
-        OneWire ourWire;
         DallasTemperature sensors;
 
     public:
