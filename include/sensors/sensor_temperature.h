@@ -8,7 +8,7 @@
 #include <communication/mqtt_manager.h>
 #include <sensors/sensor.h>
 
-class TemperatureSensor : public MqttObserver, public Sensor
+class TemperatureSensor : public Sensor
 {
     private:
         OneWire ds;
@@ -22,7 +22,7 @@ class TemperatureSensor : public MqttObserver, public Sensor
         void loop(unsigned int timeout = 500U);
         void readSensorValue() override;
         void publish() override;
-        void update() override;
+        void update(StaticJsonDocument<200> doc) override;
 };
 
 #endif // sensor_temperature_h

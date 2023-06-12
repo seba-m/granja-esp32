@@ -2,8 +2,9 @@
 #define device_h
 
 #include <Arduino.h>
+#include <observer/observer.h>
 
-class Device
+class Device : public MqttObserver
 {
     private:
         bool enabled = false;

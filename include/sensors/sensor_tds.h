@@ -9,7 +9,7 @@
 #define VREF 5.0
 #define SCOUNT 30
 
-class MeasureTDS : public MqttObserver, public Sensor
+class MeasureTDS : public Sensor
 {
     private:
         int analogBuffer[SCOUNT];
@@ -33,7 +33,7 @@ class MeasureTDS : public MqttObserver, public Sensor
         int getMedianNum(int bArray[], int iFilterLen);
         void readSensorValue() override;
         void publish() override;
-        void update() override;
+        void update(StaticJsonDocument<200> doc) override;
 };
 
 #endif // sensor_tds_h

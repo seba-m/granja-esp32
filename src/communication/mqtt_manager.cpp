@@ -1,6 +1,3 @@
-#ifndef mqtt_manager_cpp
-#define mqtt_manager_cpp
-
 #include <communication/mqtt_manager.h>
 
 MqttManager::MqttManager() : client(wifiClient)
@@ -28,7 +25,7 @@ void MqttManager::loop()
     client.loop();
 }
 
-void MqttManager::publish(const char *topic, StaticJsonDocument <200> &doc)
+void MqttManager::publish(const char *topic, StaticJsonDocument<200> &doc)
 {
     if (!isValidMqtt())
     {
@@ -47,13 +44,20 @@ bool MqttManager::isValidWifi()
 
 bool MqttManager::isValidMqtt()
 {
-    return isValidWifi() && mqtt_enabled && mqtt_server && mqtt_port && mqtt_user && mqtt_password;
+    return isValidWifi() && mqtt_enabled && mqtt_server && mqtt_port;
 }
 
 const char *MqttManager::getEspId()
 {
     static char id[32];
-    snprintf(id, sizeof(id), "%s_%012X", mqtt_user, ESP.getEfuseMac());
+    if (mqtt_user && !*mqtt_user)
+    {
+        snprintf(id, sizeof(id), "%s_%012X", mqtt_user, ESP.getEfuseMac());
+    }
+    else
+    {
+        snprintf(id, sizeof(id), "%012X", ESP.getEfuseMac());
+    }
     return id;
 }
 
@@ -93,39 +97,47 @@ void MqttManager::connectMQTT()
     {
         Serial.println("Connecting to MQTT broker: " + String(mqtt_server) + " ...");
     }
+
     client.setServer(mqtt_server, mqtt_port);
     client.setCallback([this](char *topic, byte *payload, unsigned int length)
-    { 
-        this->notify(topic, payload, length); 
-    });
+                       { this->notify(topic, payload, length); });
 
     while (!client.connected())
     {
-        if (client.connect("espId", mqtt_user, mqtt_password))
+        if (mqtt_user && !*mqtt_user &&
+            mqtt_password && !*mqtt_password)
         {
-            String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
-            client.subscribe("device/test");
-            client.publish("device/test", message.c_str());
-
-            if (log_enabled)
+            if (client.connect("espId", mqtt_user, mqtt_password))
             {
-                Serial.println(message);
-                Serial.println("MQTT connected");
+                break;
             }
         }
         else
         {
-            if (log_enabled)
+            if (client.connect("espId"))
             {
-                Serial.println("failed with state '" + String(client.state()) + "' espId: " + espId);
+                break;
             }
-            delay(1000);
         }
+
+        if (log_enabled)
+        {
+            Serial.println("Failed to connect to MQTT broker. Retrying in 1 second...");
+        }
+        delay(1000);
     }
 
-    if (log_enabled)
+    if (client.connected())
     {
-        Serial.println("MQTT connected");
+        String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
+        client.subscribe("device/test");
+        client.publish("device/test", message.c_str());
+
+        if (log_enabled)
+        {
+            Serial.println(message);
+            Serial.println("MQTT connected");
+        }
     }
 }
 
@@ -138,93 +150,46 @@ void MqttManager::reconnect()
 
     if (log_enabled)
     {
-        Serial.println("Connecting to MQTT broker again: " + String(mqtt_server) + " ...");
+        Serial.println("Reconnecting to MQTT broker: " + String(mqtt_server) + " ...");
     }
+
     connectWiFi();
 
     while (!client.connected())
     {
-        if (client.connect("espId", mqtt_user, mqtt_password))
+        if (mqtt_user && !*mqtt_user &&
+            mqtt_password && !*mqtt_password)
         {
-            String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
-            client.subscribe("device/test");
-            client.publish("device/test", message.c_str());
-
-            if (log_enabled)
+            if (client.connect("espId", mqtt_user, mqtt_password))
             {
-                Serial.println(message);
-                Serial.println("MQTT connected");
+                break;
             }
         }
         else
         {
-            if (log_enabled)
+            if (client.connect("espId"))
             {
-                Serial.println("failed with state " + String(client.state()) + " espId: " + espId);
+                break;
             }
-            delay(1000);
+        }
+
+        if (log_enabled)
+        {
+            Serial.println("Failed to reconnect to MQTT broker. Retrying in 1 second...");
+        }
+        delay(1000);
+    }
+
+    if (client.connected())
+    {
+        String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
+        client.subscribe("device/test");
+        client.publish("device/test", message.c_str());
+
+        if (log_enabled)
+        {
+            Serial.println(message);
+            Serial.println("MQTT connected");
         }
     }
-
-    if (log_enabled)
-    {
-        Serial.println("MQTT connected");
-    }
 }
-
-void MqttManager::handleSensorAction(Device *device, StaticJsonDocument<200> value)
-{
-    Sensor *sensor = (Sensor *)device;
-    
-    String command = value["command"];
-    
-    if (command == "enable")
-    {
-        sensor->enable();
-    } else if (command == "disable")
-    {
-        sensor->disable();
-    } else if (command == "set_pin")
-    {
-        int pin = value["pin"];
-        sensor->setPin(pin);
-        //TODO: check if pin wont be used by other sensor
-    } else if (command == "set_name")
-    {
-        const char *topic = value["new_name"];
-        sensor->setDeviceName(topic);
-    }
-    //TODO: add other commands
-}
-
-void MqttManager::handleActuatorAction(Device *device, StaticJsonDocument<200> value)
-{
-    Actuator *actuator = (Actuator *)device;
-
-    String command = value["command"];
-
-    if (command == "enable")
-    {
-        actuator->enable();
-    } else if (command == "disable")
-    {
-        actuator->disable();
-    } else if (command == "turn_on") 
-    {
-        int time = value["time"];
-        actuator->turnOn(time);
-    } else if (command == "turn_off")
-    {
-        actuator->turnOff();
-    } else if (command == "set_pin")
-    {
-        std::map<int, String> pins = value["pins"];
-        actuator->setPins(pins);
-    } else if (command == "set_name")
-    {
-        const char *topic = value["new_name"];
-        actuator->setDeviceName(topic);
-    }
-}
-
-#endif

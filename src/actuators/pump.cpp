@@ -1,18 +1,20 @@
 #include <actuators/pump.h>
 
-PumpController::PumpController() 
-    : Actuator({
-        {pumpEnaPin, "ENA"}, 
-        {pumpIn1Pin, "IN1"}, 
-        {pumpIn2Pin, "IN2"}
-    })
+PumpController::PumpController()
+    : Actuator({{pumpEnaPin, "ENA"},
+                {pumpIn1Pin, "IN1"},
+                {pumpIn2Pin, "IN2"}})
 {
     setDeviceName("pump");
+    on = false;
+    speedPercentage = 100; // Default speed: 100%
+    timeInSeconds = 10;    // Default time: 10 seconds
 }
 
 void PumpController::setup()
 {
-    if (!isEnabled() || !isValidPins()) return;
+    if (!isEnabled() || !isValidPins())
+        return;
 
     for (auto const pin : getPins())
     {
@@ -22,7 +24,8 @@ void PumpController::setup()
 
 void PumpController::turnOn(int seconds)
 {
-    if (getState() || !isEnabled() || !isValidPins()) return;
+    if (on || !isEnabled() || !isValidPins())
+        return;
 
     for (auto const pin : getPins())
     {
@@ -30,26 +33,70 @@ void PumpController::turnOn(int seconds)
             digitalWrite(pin.first, LOW);
         else
             digitalWrite(pin.first, HIGH);
-    }    
+    }
 
-    setState(true);
-    delay(seconds * 1000);
+    on = true;
+    timeInSeconds = seconds;
+    delay(timeInSeconds * 1000);
     turnOff();
 }
 
 void PumpController::turnOff()
 {
-    if (!getState() || !isEnabled() || !isValidPins())
+    if (!on || !isEnabled() || !isValidPins())
         return;
 
     for (auto const pin : getPins())
     {
         digitalWrite(pin.first, LOW);
     }
-    setState(false);
+    on = false;
 }
 
-void PumpController::update()
+void PumpController::update(StaticJsonDocument<200> value)
 {
-    // TODO: implement update
+    String command = value["command"];
+    
+    if (command == "enable")
+    {
+        this->enable();
+    }
+    else if (command == "disable")
+    {
+        this->disable();
+    }
+    else if (command == "turn_on")
+    {
+        int time = value["time"];
+        this->turnOn(time);
+    }
+    else if (command == "turn_off")
+    {
+        this->turnOff();
+    }
+    else if (command == "set_pin")
+    {
+        std::map<int, String> pins = value["pins"];
+        this->setPins(pins);
+    }
+    else if (command == "set_name")
+    {
+        const char *topic = value["new_name"];
+        this->setDeviceName(topic);
+    } else if (command == "set_speed") {
+        int percentage = value["percentage"];
+        this->setSpeedPercentage(percentage);
+    }
+}
+
+void PumpController::setSpeedPercentage(int percentage)
+{
+    speedPercentage = constrain(percentage, 0, 100);
+    int speedValue = convertPercentageToSpeed(speedPercentage);
+    analogWrite(pumpEnaPin, speedValue);
+}
+
+int PumpController::convertPercentageToSpeed(int percentage)
+{
+    return map(percentage, 0, 100, 0, 255);
 }

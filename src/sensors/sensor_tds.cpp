@@ -146,7 +146,32 @@ int MeasureTDS::getMedianNum(int bArray[], int iFilterLen)
     return bTemp;
 }
 
-void MeasureTDS::update()
+void MeasureTDS::update(StaticJsonDocument<200> value)
 {
-    // TODO: implement update
+    if (!value.containsKey("command"))
+    {
+        if (log_enabled)
+            Serial.println("No command in message");
+        return;
+    }
+
+    const char *command = value["command"];
+    
+    if (command == "enable")
+    {
+        this->enable();
+    } else if (command == "disable")
+    {
+        this->disable();
+    } else if (command == "set_pin")
+    {
+        int pin = value["pin"];
+        this->setPin(pin);
+        //TODO: check if pin wont be used by other sensor
+    } else if (command == "set_name")
+    {
+        const char *topic = value["new_name"];
+        this->setDeviceName(topic);
+    }
+    //TODO: add other commands
 }

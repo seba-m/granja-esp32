@@ -7,7 +7,7 @@
 #include <communication/mqtt_manager.h>
 #include <sensors/sensor.h>
 
-class DHTSensor : public MqttObserver, public Sensor
+class DHTSensor : public Sensor
 {
     private:
         unsigned long timepoint = 0;
@@ -20,7 +20,7 @@ class DHTSensor : public MqttObserver, public Sensor
 
         void setup();
         void loop(unsigned int timeout = 500U);
-        void update() override;
+        void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;
 
     private:

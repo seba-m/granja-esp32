@@ -6,7 +6,7 @@
 #include <communication/mqtt_manager.h>
 #include <sensors/sensor.h>
 
-class WaterLevelSensor : public MqttObserver, public Sensor
+class WaterLevelSensor : public Sensor
 {
     private:
         unsigned long timepoint = 0;
@@ -16,7 +16,7 @@ class WaterLevelSensor : public MqttObserver, public Sensor
         WaterLevelSensor(MqttManager &manager);
         void setup();
         void loop(unsigned int timeout = 500U);
-        void update() override;
+        void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;
 
     private:

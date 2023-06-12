@@ -6,7 +6,7 @@
 #include <communication/mqtt_manager.h>
 #include <sensors/sensor.h>
 
-class TurbiditySensor : public MqttObserver, public Sensor
+class TurbiditySensor : public Sensor
 {
     private:
         unsigned long timepoint = 0;
@@ -15,7 +15,7 @@ class TurbiditySensor : public MqttObserver, public Sensor
     public:
         TurbiditySensor(MqttManager &manager);
         void loop(unsigned int timeout = 100U);
-        void update() override;
+        void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;
 
     private:
