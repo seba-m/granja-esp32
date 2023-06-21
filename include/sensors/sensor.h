@@ -10,14 +10,16 @@
 class Sensor : public Device
 {
     private:
-        std::map<String, float> values;
         int pin;
+        std::map<String, float> values;
         SensorStatus status = SensorStatus::InProgress;
+        int sensorType = 0;
 
     public:
-        Sensor(int pin)
+        Sensor(int pin, int type = 0)
         {
             setPin(pin);
+            setSensorType(type);
         }
 
         void setValue(String type, float value)
@@ -49,6 +51,19 @@ class Sensor : public Device
         {
             this->pin = pin;
             setValidPins(pin > -1);
+            if (pin > -1) {
+                enable();
+            }
+        }
+
+        void setSensorType(int type)
+        {
+            this->sensorType = type;
+        }
+
+        int getSensorType()
+        {
+            return this->sensorType;
         }
 
         virtual void readSensorValue() = 0;

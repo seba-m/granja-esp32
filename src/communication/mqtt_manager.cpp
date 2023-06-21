@@ -49,14 +49,14 @@ bool MqttManager::isValidMqtt()
 
 const char *MqttManager::getEspId()
 {
-    static char id[32];
+    static char id[70];
     if (mqtt_user && !*mqtt_user)
     {
         snprintf(id, sizeof(id), "%s_%012X", mqtt_user, ESP.getEfuseMac());
     }
     else
     {
-        snprintf(id, sizeof(id), "%012X", ESP.getEfuseMac());
+        snprintf(id, sizeof(id), "%s_%012X", "esp", ESP.getEfuseMac());
     }
     return id;
 }
@@ -100,21 +100,21 @@ void MqttManager::connectMQTT()
 
     client.setServer(mqtt_server, mqtt_port);
     client.setCallback([this](char *topic, byte *payload, unsigned int length)
-                       { this->notify(topic, payload, length); });
+                        { this->notify(topic, payload, length); });
+
 
     while (!client.connected())
     {
-        if (mqtt_user && !*mqtt_user &&
-            mqtt_password && !*mqtt_password)
+        if (mqtt_user && !*mqtt_user && mqtt_password && !*mqtt_password)
         {
-            if (client.connect("espId", mqtt_user, mqtt_password))
+            if (client.connect(espId.c_str(), mqtt_user, mqtt_password))
             {
                 break;
             }
         }
         else
         {
-            if (client.connect("espId"))
+            if (client.connect(espId.c_str()))
             {
                 break;
             }
@@ -129,9 +129,9 @@ void MqttManager::connectMQTT()
 
     if (client.connected())
     {
-        String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
-        client.subscribe("device/test");
-        client.publish("device/test", message.c_str());
+        String message = "device connected: " + espId;
+        client.subscribe("devices/test");
+        client.publish("devices/test", espId.c_str());
 
         if (log_enabled)
         {
@@ -157,17 +157,16 @@ void MqttManager::reconnect()
 
     while (!client.connected())
     {
-        if (mqtt_user && !*mqtt_user &&
-            mqtt_password && !*mqtt_password)
+        if (mqtt_user && !*mqtt_user && mqtt_password && !*mqtt_password)
         {
-            if (client.connect("espId", mqtt_user, mqtt_password))
+            if (client.connect(espId.c_str(), mqtt_user, mqtt_password))
             {
                 break;
             }
         }
         else
         {
-            if (client.connect("espId"))
+            if (client.connect(espId.c_str()))
             {
                 break;
             }
@@ -182,9 +181,9 @@ void MqttManager::reconnect()
 
     if (client.connected())
     {
-        String message = "device connected " + String(mqtt_user) + "_" + String(ESP.getEfuseMac());
-        client.subscribe("device/test");
-        client.publish("device/test", message.c_str());
+        String message = "device connected: " + espId;
+        client.subscribe("devices/test");
+        client.publish("devices/test", espId.c_str());
 
         if (log_enabled)
         {

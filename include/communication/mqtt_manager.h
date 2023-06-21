@@ -1,3 +1,6 @@
+#ifndef mqtt_manager_h
+#define mqtt_manager_h
+
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
@@ -12,7 +15,7 @@ class MqttManager : public Subject
 private:
     WiFiClient wifiClient;
     PubSubClient client;
-    const char *espId;
+    String espId;
     std::vector<Device *> observers;
 
 public:
@@ -83,17 +86,17 @@ public:
             return;
         }
 
-        if (type == "sensor")
+        if (type == "sensors")
         {
-            Sensor *sensor = dynamic_cast<Sensor *>(device);
+            Sensor *sensor = (Sensor*)(device);
             if (sensor)
             {
                 sensor->update(doc);
             }
         }
-        else if (type == "actuator")
+        else if (type == "actuators")
         {
-            Actuator *actuator = dynamic_cast<Actuator *>(device);
+            Actuator *actuator = (Actuator*)(device);
             if (actuator)
             {
                 actuator->update(doc);
@@ -125,3 +128,5 @@ private:
     void connectMQTT();
     void reconnect();
 };
+
+#endif

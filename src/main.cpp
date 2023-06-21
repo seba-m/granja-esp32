@@ -26,6 +26,7 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial.println("-----------------------");
     Serial.println("Starting...");
 
     // mqtt configuration
@@ -44,6 +45,7 @@ void setup()
     dhtSensor.setup();
 
     Serial.println("Started");
+    Serial.println("-----------------------");
 }
 
 void loop()

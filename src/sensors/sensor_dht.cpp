@@ -1,7 +1,8 @@
 #include <sensors/sensor_dht.h>
 #include <status.h>
 
-DHTSensor::DHTSensor(MqttManager &manager) : mqttManager(manager), Sensor(dhtSensorPin) {
+DHTSensor::DHTSensor(MqttManager &manager) : mqttManager(manager), Sensor(dhtSensorPin, dhtSensorType)
+{
     setDeviceName("dht");
 }
 
@@ -22,7 +23,7 @@ void DHTSensor::setup()
         return;
     }
 
-    dht = new DHT(dhtSensorPin, dhtSensorType);
+    dht = new DHT(this->getPin(), this->getSensorType());
     dht->begin();
     this->setStatus(SensorStatus::OkSetup);
 }
@@ -148,6 +149,15 @@ void DHTSensor::update(StaticJsonDocument<200> value)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
+    } else if (command == "get_status") {
+        StaticJsonDocument<200> doc;
+        doc["type"] = "sensor";
+        doc["sensor"] = "dht";
+        doc["status"] = this->getStatus();
+        doc["pin"] = this->getPin();
+        doc["name"] = this->getDeviceName();
+        doc["type"] = this->getSensorType();
+        mqttManager.publish(mqtt_topic_dht, doc);
     }
     //TODO: add other commands
 }

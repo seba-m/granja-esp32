@@ -76,8 +76,17 @@ void PumpController::update(StaticJsonDocument<200> value)
     }
     else if (command == "set_pin")
     {
-        std::map<int, String> pins = value["pins"];
-        this->setPins(pins);
+        JsonObject pins = value["pins"];
+
+        std::map<int, String> pinValues;
+        for (JsonPair keyValue : pins)
+        {
+            int pin = String(keyValue.key().c_str()).toInt();
+            String pinValue = keyValue.value().as<String>();
+            pinValues[pin] = pinValue;
+        }
+
+        this->setPins(pinValues);
     }
     else if (command == "set_name")
     {
