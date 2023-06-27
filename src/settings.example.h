@@ -11,7 +11,7 @@ CONFIGURACIÓN DE LOS SENSORES
 **************************************************************/
 #define waterLevelSensorPin 1   // Pin utilizado para el sensor de nivel de agua
 #define turbiditySensorPin 2    // Pin utilizado para el sensor de turbidez
-#define TdsSensorPin 3          // Pin utilizado para el sensor de TDS (Total Dissolved Solids)
+#define tdsSensorPin 3          // Pin utilizado para el sensor de TDS (Total Dissolved Solids)
 #define temperatureSensorPin 4  // Pin utilizado para el sensor de temperatura
 #define phSensorPin 5           // Pin utilizado para el sensor de pH
 

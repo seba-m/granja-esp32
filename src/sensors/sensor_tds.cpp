@@ -1,6 +1,6 @@
 #include <sensors/sensor_tds.h>
 
-MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor(TdsSensorPin) {
+MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor(tdsSensorPin) {
     setDeviceName("tds");
 }
 
@@ -16,7 +16,7 @@ void MeasureTDS::setup()
         return;
     }
 
-    pinMode(TdsSensorPin, INPUT);
+    pinMode(tdsSensorPin, INPUT);
     this->setStatus(SensorStatus::OkSetup);
 }
 
@@ -87,11 +87,12 @@ void MeasureTDS::readAnalogValue(unsigned int timeout)
 {
     if (millis() - analogSampleTimepoint > timeout)
     {
-        analogSampleTimepoint = millis();
-        analogBuffer[analogBufferIndex] = analogRead(TdsSensorPin);
+        analogBuffer[analogBufferIndex] = analogRead(tdsSensorPin);
         analogBufferIndex++;
         if (analogBufferIndex == SCOUNT)
             analogBufferIndex = 0;
+
+        analogSampleTimepoint = millis();
     } 
 }
 
@@ -99,7 +100,6 @@ void MeasureTDS::printTDSValue(unsigned int timeout)
 {
     if (millis() - printTimepoint > timeout)
     {
-        printTimepoint = millis();
         for (copyIndex = 0; copyIndex < SCOUNT; copyIndex++)
             analogBufferTemp[copyIndex] = analogBuffer[copyIndex];
 
@@ -118,6 +118,7 @@ void MeasureTDS::printTDSValue(unsigned int timeout)
         setValue("tds", tdsValue);
         this->setStatus(SensorStatus::OkRead);
         publish();
+        printTimepoint = millis();
     }
 }
 

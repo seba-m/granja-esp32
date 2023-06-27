@@ -36,10 +36,10 @@ void TemperatureSensor::loop(unsigned int timeout)
 
     if (millis() - timepoint > timeout)
     {
-        timepoint = millis();
         readSensorValue();
         publish();
         this->setStatus(SensorStatus::OkLoop);
+        timepoint = millis();
     }
 }
 

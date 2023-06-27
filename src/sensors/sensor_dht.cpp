@@ -32,8 +32,6 @@ void DHTSensor::loop(unsigned int timeout)
 {
     if (millis() - timepoint > timeout)
     {
-        timepoint = millis();
-
         if (!isValidPins() || !isEnabled())
         {
             if (isEnabled() && log_enabled)
@@ -47,6 +45,7 @@ void DHTSensor::loop(unsigned int timeout)
         readSensorValue();
         publish();
         this->setStatus(SensorStatus::OkLoop);
+        timepoint = millis();
     }
 }
 

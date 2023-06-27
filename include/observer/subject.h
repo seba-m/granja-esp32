@@ -14,4 +14,4 @@ class Subject
         virtual void notify(char *topic, byte *payload, unsigned int length) = 0;
 };
 
-#endif
+#endif // subject_h

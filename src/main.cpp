@@ -26,8 +26,10 @@ void setup()
 {
     Serial.begin(115200);
 
-    Serial.println("-----------------------");
-    Serial.println("Starting...");
+    if (log_enabled) {
+        Serial.println("-----------------------");
+        Serial.println("Starting...");
+    }
 
     // mqtt configuration
     mqttManager.setup();
@@ -44,8 +46,11 @@ void setup()
     temperatureSensor.setup();
     dhtSensor.setup();
 
-    Serial.println("Started");
-    Serial.println("-----------------------");
+    if (log_enabled)
+    {
+        Serial.println("Started");
+        Serial.println("-----------------------");
+    }
 }
 
 void loop()
