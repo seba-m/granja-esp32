@@ -64,14 +64,6 @@ void DHTSensor::publish()
     float humidity = getValue("humidity");
     float temperature = getValue("temperature");
 
-    if (isnan(humidity) || isnan(temperature))
-    {
-        if (log_enabled)
-            Serial.println("Failed to read from DHT sensor!");
-        this->setStatus(SensorStatus::FailedRead);
-        return;
-    }
-
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
     doc["sensor"] = "dht";

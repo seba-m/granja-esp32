@@ -39,16 +39,6 @@ void TurbiditySensor::publish()
 
     float turbidity = getValue("turbidity");
 
-    if (isnan(turbidity))
-    {
-        if (log_enabled)
-        {
-            Serial.println("Failed to read from turbidity sensor!");
-        }
-        this->setStatus(SensorStatus::FailedRead);
-        return;
-    }
-
     if (log_enabled)
     {
         Serial.print("Turbidity: ");

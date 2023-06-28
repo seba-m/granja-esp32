@@ -57,14 +57,6 @@ void TemperatureSensor::publish()
 
     float temp = getValue("temperature");
 
-    if (isnan(temp))
-    {
-        if (log_enabled)
-            Serial.println("Failed to read from Temperature sensor!");
-        this->setStatus(SensorStatus::FailedRead);
-        return;
-    }
-
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
     doc["sensor"] = "temperature";
