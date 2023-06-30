@@ -127,6 +127,9 @@ void TemperatureSensor::update(StaticJsonDocument<200> value)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
+    } else {
+        if (log_enabled)
+            Serial.println("Invalid command" + String(command));
     }
     //TODO: add other commands
 }

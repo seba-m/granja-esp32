@@ -50,13 +50,13 @@ bool MqttManager::isValidMqtt()
 const char *MqttManager::getEspId()
 {
     static char id[70];
-    if (mqtt_user && !*mqtt_user)
+    if (!String(mqtt_user).isEmpty())
     {
         snprintf(id, sizeof(id), "%s_%012X", mqtt_user, ESP.getEfuseMac());
     }
     else
     {
-        snprintf(id, sizeof(id), "%s_%012X", "esp", ESP.getEfuseMac());
+        snprintf(id, sizeof(id), "esp_%012X", ESP.getEfuseMac());
     }
     return id;
 }
@@ -130,8 +130,7 @@ void MqttManager::connectMQTT()
     if (client.connected())
     {
         String message = "device connected: " + espId;
-        client.subscribe("devices/test");
-        client.publish("devices/test", espId.c_str());
+        client.subscribe("actions");
 
         if (log_enabled)
         {
@@ -182,8 +181,7 @@ void MqttManager::reconnect()
     if (client.connected())
     {
         String message = "device connected: " + espId;
-        client.subscribe("devices/test");
-        client.publish("devices/test", espId.c_str());
+        client.subscribe("actions");
 
         if (log_enabled)
         {

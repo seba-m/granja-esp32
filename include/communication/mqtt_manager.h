@@ -49,7 +49,7 @@ public:
         String message = "";
         for (int i = 0; i < length; i++)
         {
-            message.concat(payload[i]);
+            message.concat((char)payload[i]);
         }
 
         if (log_enabled)
@@ -74,7 +74,7 @@ public:
         String type = doc["type"];
         String name = doc["name"];
 
-        if (owner != espId)
+        if (!owner.equals(espId))
         {
             return; // check if message is for this device
         }
@@ -83,6 +83,10 @@ public:
 
         if (device == nullptr)
         {
+            if (log_enabled)
+            {
+                Serial.println("Device not found: " + name);
+            }
             return;
         }
 
@@ -92,6 +96,11 @@ public:
             if (sensor)
             {
                 sensor->update(doc);
+            } else {
+                if (log_enabled)
+                {
+                    Serial.println("Sensor not found: " + name);
+                }
             }
         }
         else if (type == "actuators")
@@ -100,6 +109,11 @@ public:
             if (actuator)
             {
                 actuator->update(doc);
+            } else {
+                if (log_enabled)
+                {
+                    Serial.println("Actuator not found: " + name);
+                }
             }
         }
     }

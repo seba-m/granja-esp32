@@ -124,23 +124,28 @@ void DHTSensor::update(StaticJsonDocument<200> value)
     }
 
     const char *command = value["command"];
-    
-    if (command == "enable")
+
+    if (strcmp(command, "enable") == 0)
     {
         this->enable();
-    } else if (command == "disable")
+    }
+    else if (strcmp(command, "disable") == 0)
     {
         this->disable();
-    } else if (command == "set_pin")
+    }
+    else if (strcmp(command, "set_pin") == 0)
     {
         int pin = value["pin"];
         this->setPin(pin);
-        //TODO: check if pin wont be used by other sensor
-    } else if (command == "set_name")
+        // TODO: check if pin wont be used by other sensor
+    }
+    else if (strcmp(command, "set_name") == 0)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
-    } else if (command == "get_status") {
+    }
+    else if (strcmp(command, "get_status") == 0)
+    {
         StaticJsonDocument<200> doc;
         doc["type"] = "sensor";
         doc["sensor"] = "dht";
@@ -150,5 +155,5 @@ void DHTSensor::update(StaticJsonDocument<200> value)
         doc["type"] = this->getSensorType();
         mqttManager.publish(mqtt_topic_dht, doc);
     }
-    //TODO: add other commands
+    // TODO: add other commands
 }
