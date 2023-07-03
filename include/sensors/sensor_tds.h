@@ -26,6 +26,7 @@ class MeasureTDS : public Sensor
         MeasureTDS(MqttManager &manager);
         void setup();
         void loop();
+        void update(StaticJsonDocument<200> doc) override;
 
     private:
         void readAnalogValue(unsigned int timeout = 40U);
@@ -33,7 +34,6 @@ class MeasureTDS : public Sensor
         int getMedianNum(int bArray[], int iFilterLen);
         void readSensorValue() override;
         void publish() override;
-        void update(StaticJsonDocument<200> doc) override;
 };
 
 #endif // sensor_tds_h

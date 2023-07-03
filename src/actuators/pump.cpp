@@ -55,8 +55,15 @@ void PumpController::turnOff()
 
 void PumpController::update(StaticJsonDocument<200> value)
 {
-    String command = value["command"];
-    
+    if (!value.containsKey("command"))
+    {
+        if (log_enabled)
+            Serial.println("No command in message");
+        return;
+    }
+
+    const char *command = value["command"];
+
     if (command == "enable")
     {
         this->enable();

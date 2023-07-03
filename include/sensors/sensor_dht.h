@@ -19,7 +19,7 @@ class DHTSensor : public Sensor
         ~DHTSensor();
 
         void setup();
-        void loop(unsigned int timeout = 500U);
+        void loop(unsigned int timeout = 2000U);
         void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;
 
