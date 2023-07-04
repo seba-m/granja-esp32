@@ -60,8 +60,8 @@ void TemperatureSensor::publish()
 
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
-    doc["sensor"] = "temperature";
-    doc["temperature"] = temp;
+    doc["sensor"] = this->getDeviceName();
+    doc[this->getDeviceName()] = temp;
     doc["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_water_temperature, doc);

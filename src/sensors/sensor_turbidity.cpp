@@ -62,8 +62,8 @@ void TurbiditySensor::publish()
 
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
-    doc["sensor"] = "turbidity";
-    doc["turbidity"] = turbidity;
+    doc["sensor"] = this->getDeviceName();
+    doc[this->getDeviceName()] = turbidity;
     doc["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_turbidity, doc);

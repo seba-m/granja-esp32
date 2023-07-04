@@ -55,6 +55,9 @@ void setup()
     waterLevelSensor2.setup(waterLevelSensorPin2, "water_level2");
     waterLevelSensor3.setup(waterLevelSensorPin3, "water_level3");
 
+    // actuator configuration
+    controller.setup(pumpEnaPin, pumpIn1Pin, pumpIn2Pin);
+
     if (log_enabled)
     {
         Serial.println("Started");
@@ -76,4 +79,7 @@ void loop()
 
     waterLevelSensor2.loop();
     waterLevelSensor3.loop();
+
+    // actuator loop
+    controller.loop();
 }

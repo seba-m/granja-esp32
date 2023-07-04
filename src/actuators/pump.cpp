@@ -1,24 +1,30 @@
 #include <actuators/pump.h>
 
-PumpController::PumpController()
-    : Actuator({{pumpEnaPin, "ENA"},
-                {pumpIn1Pin, "IN1"},
-                {pumpIn2Pin, "IN2"}})
+PumpController::PumpController(): Actuator()
 {
-    setDeviceName("pump");
-    on = false;
-    speedPercentage = 100; // Default speed: 100%
-    timeInSeconds = 10;    // Default time: 10 seconds
 }
 
-void PumpController::setup()
+void PumpController::setup(int ena, int in1, int in2, String name)
 {
+    setPins({{ena, "ENA"}, {in1, "IN1"}, {in2, "IN2"}});
+    setDeviceName(name);
     if (!isEnabled() || !isValidPins())
         return;
 
     for (auto const pin : getPins())
     {
         pinMode(pin.first, OUTPUT);
+    }
+}
+
+void PumpController::loop()
+{
+    if (!isEnabled() || !isValidPins())
+        return;
+
+    if (on)
+    {
+        turnOn(timeInSeconds);
     }
 }
 

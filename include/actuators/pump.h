@@ -10,15 +10,16 @@ class PumpController : public Actuator
 {
     public:
         PumpController();
-        void setup();
+        void setup(int ena = -1, int in1 = -1, int in2 = -1, String name = "pump");
+        void loop();
         void turnOn(int seconds = 10) override;
         void turnOff() override;
         void update(StaticJsonDocument<200> doc) override;
 
     private:
-        bool on;
-        int speedPercentage;
-        int timeInSeconds;
+        bool on = false;
+        int speedPercentage = 100; // Default speed: 100%
+        int timeInSeconds = 10;    // Default time: 10 seconds
 
         void setSpeedPercentage(int percentage);
         int convertPercentageToSpeed(int percentage);

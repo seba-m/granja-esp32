@@ -77,8 +77,8 @@ void MeasureTDS::publish()
 
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
-    doc["sensor"] = "tds";
-    doc["tds"] = tdsValue;
+    doc["sensor"] = this->getDeviceName();
+    doc[this->getDeviceName()] = tdsValue;
     doc["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_tds, doc);

@@ -14,20 +14,6 @@ class Actuator : public Device
         int onTime = 0;
 
     public:
-        Actuator(std::map<int, String> pins)
-        {
-            this->pins = pins;
-            setValidPins(
-                pins.size() > 0 &&
-                std::all_of(
-                    pins.begin(), pins.end(), [](std::pair<int, String> pin)
-                    { 
-                        return pin.first > -1; 
-                    }
-                )
-            );
-        }
-
         void setState(bool state)
         {
             this->state = state;
@@ -41,6 +27,11 @@ class Actuator : public Device
         void setPins(std::map<int, String> pins)
         {
             this->pins = pins;
+            setValidPins(
+                pins.size() > 0 &&
+                std::all_of(
+                    pins.begin(), pins.end(), [](std::pair<int, String> pin)
+                    { return pin.first > -1; }));
         }
 
         std::map<int, String> getPins()

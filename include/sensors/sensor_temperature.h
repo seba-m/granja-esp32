@@ -18,7 +18,7 @@ class TemperatureSensor : public Sensor
 
     public:
         TemperatureSensor(MqttManager &manager);
-        void setup(int pin = -1, String name = "temperature");
+        void setup(int pin = -1, String name = "water_temperature");
         void loop(unsigned int timeout = 500U);
         void readSensorValue() override;
         void publish() override;

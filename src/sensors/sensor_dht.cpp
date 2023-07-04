@@ -68,9 +68,9 @@ void DHTSensor::publish()
 
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
-    doc["sensor"] = "dht";
-    doc["humidity"] = humidity;
-    doc["temperature"] = temperature;
+    doc["sensor"] = this->getDeviceName();
+    doc[this->getDeviceName() + "_humidity"] = humidity;
+    doc[this->getDeviceName() + "_temperature"] = temperature;
     doc["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_dht, doc);

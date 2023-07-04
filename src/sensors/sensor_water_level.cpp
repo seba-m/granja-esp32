@@ -58,8 +58,8 @@ void WaterLevelSensor::publish()
 
     StaticJsonDocument<200> doc;
     doc["type"] = "sensor";
-    doc["sensor"] = "water_level";
-    doc["water_level"] = level;
+    doc["sensor"] = this->getDeviceName();
+    doc[this->getDeviceName()] = level;
     doc["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_water_level, doc);
