@@ -24,7 +24,7 @@ class MeasureTDS : public Sensor
 
     public:
         MeasureTDS(MqttManager &manager);
-        void setup();
+        void setup(int pin = -1, String name = "tds");
         void loop();
         void update(StaticJsonDocument<200> doc) override;
 

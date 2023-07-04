@@ -14,6 +14,7 @@ class TurbiditySensor : public Sensor
 
     public:
         TurbiditySensor(MqttManager &manager);
+        void setup(int pin = -1, String name = "turbidity");
         void loop(unsigned int timeout = 100U);
         void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;

@@ -1,11 +1,12 @@
 #include <sensors/sensor_water_level.h>
 
-WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager), Sensor(waterLevelSensorPin) {
-    setDeviceName("water_level");
+WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager), Sensor() {
 }
 
-void WaterLevelSensor::setup()
+void WaterLevelSensor::setup(int pin, String deviceName)
 {
+    setPin(pin);
+    setDeviceName(deviceName);
     if (!isValidPins() || !isEnabled())
     {
         if (isEnabled() && log_enabled)

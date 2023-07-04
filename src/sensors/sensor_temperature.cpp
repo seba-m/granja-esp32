@@ -1,11 +1,12 @@
 #include <sensors/sensor_temperature.h>
 
-TemperatureSensor::TemperatureSensor(MqttManager &manager) : mqttManager(manager), Sensor(temperatureSensorPin) {
-    setDeviceName("temperature");
+TemperatureSensor::TemperatureSensor(MqttManager &manager) : mqttManager(manager), Sensor() {
 }
 
-void TemperatureSensor::setup()
+void TemperatureSensor::setup(int pin, String name)
 {
+    setDeviceName(name);
+    setPin(pin);
     if (!isValidPins() || !isEnabled())
     {
         if (isEnabled() && log_enabled)

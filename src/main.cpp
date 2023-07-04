@@ -18,6 +18,8 @@ MqttManager mqttManager;
 
 MeasureTDS measureTDS(mqttManager);
 WaterLevelSensor waterLevelSensor(mqttManager);
+WaterLevelSensor waterLevelSensor2(mqttManager);
+WaterLevelSensor waterLevelSensor3(mqttManager);
 TurbiditySensor turbiditySensor(mqttManager);
 TemperatureSensor temperatureSensor(mqttManager);
 DHTSensor dhtSensor(mqttManager);
@@ -40,11 +42,18 @@ void setup()
     mqttManager.attach(&turbiditySensor);
     mqttManager.attach(&temperatureSensor);
 
+    mqttManager.attach(&waterLevelSensor2);
+    mqttManager.attach(&waterLevelSensor3);
+
     // sensors configuration
-    measureTDS.setup();
-    waterLevelSensor.setup();
-    temperatureSensor.setup();
-    dhtSensor.setup();
+    measureTDS.setup(tdsSensorPin);
+    temperatureSensor.setup(temperatureSensorPin);
+    dhtSensor.setup(dhtSensorPin);
+    turbiditySensor.setup(turbiditySensorPin);
+    waterLevelSensor.setup(waterLevelSensorPin);
+
+    waterLevelSensor2.setup(waterLevelSensorPin2, "water_level2");
+    waterLevelSensor3.setup(waterLevelSensorPin3, "water_level3");
 
     if (log_enabled)
     {
@@ -61,7 +70,10 @@ void loop()
     // sensors loop
     measureTDS.loop();
     waterLevelSensor.loop();
-    turbiditySensor.loop();
     temperatureSensor.loop();
     dhtSensor.loop();
+    turbiditySensor.loop();
+
+    waterLevelSensor2.loop();
+    waterLevelSensor3.loop();
 }

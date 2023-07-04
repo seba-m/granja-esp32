@@ -1,7 +1,22 @@
 #include <sensors/sensor_turbidity.h>
 
-TurbiditySensor::TurbiditySensor(MqttManager &manager) : mqttManager(manager), Sensor(turbiditySensorPin) {
-    setDeviceName("turbidity");
+TurbiditySensor::TurbiditySensor(MqttManager &manager) : mqttManager(manager), Sensor() {
+}
+
+void TurbiditySensor::setup(int pin, String name)
+{
+    setDeviceName(name);
+    setPin(pin);
+    if (!isValidPins() || !isEnabled())
+    {
+        if (isEnabled() && log_enabled)
+        {
+            Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+        }
+        return;
+    }
+    this->setStatus(SensorStatus::OkSetup);
 }
 
 void TurbiditySensor::loop(unsigned int timeout)

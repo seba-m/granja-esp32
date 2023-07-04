@@ -1,9 +1,8 @@
 #include <sensors/sensor_dht.h>
 #include <status.h>
 
-DHTSensor::DHTSensor(MqttManager &manager) : mqttManager(manager), Sensor(dhtSensorPin, dhtSensorType)
+DHTSensor::DHTSensor(MqttManager &manager) : mqttManager(manager), Sensor()
 {
-    setDeviceName("dht");
 }
 
 DHTSensor::~DHTSensor()
@@ -11,8 +10,11 @@ DHTSensor::~DHTSensor()
     delete dht;
 }
 
-void DHTSensor::setup()
+void DHTSensor::setup(int pin, int sensorType, String name)
 {
+    setPin(pin);
+    setSensorType(sensorType);
+    setDeviceName(name);
     if (!isValidPins() || !isEnabled())
     {
         if (isEnabled() && log_enabled)

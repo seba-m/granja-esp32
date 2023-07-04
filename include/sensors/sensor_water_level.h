@@ -14,7 +14,7 @@ class WaterLevelSensor : public Sensor
 
     public:
         WaterLevelSensor(MqttManager &manager);
-        void setup();
+        void setup(int pin = -1, String deviceName = "water_level");
         void loop(unsigned int timeout = 500U);
         void update(StaticJsonDocument<200> doc) override;
         void readSensorValue() override;

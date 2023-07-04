@@ -16,12 +16,6 @@ class Sensor : public Device
         int sensorType = 0;
 
     public:
-        Sensor(int pin, int type = 0)
-        {
-            setPin(pin);
-            setSensorType(type);
-        }
-
         void setValue(String type, float value)
         {
             values[type] = value;

@@ -1,11 +1,12 @@
 #include <sensors/sensor_tds.h>
 
-MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor(tdsSensorPin) {
-    setDeviceName("tds");
+MeasureTDS::MeasureTDS(MqttManager &manager) : mqttManager(manager), Sensor() {
 }
 
-void MeasureTDS::setup()
+void MeasureTDS::setup(int pin, String name)
 {
+    setDeviceName(name);
+    setPin(pin);
     if (!isValidPins() || !isEnabled())
     {
         if (isEnabled() && log_enabled)

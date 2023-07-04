@@ -18,6 +18,15 @@ CONFIGURACIÓN DE LOS SENSORES
 #define dhtSensorPin -1         // Pin utilizado para el sensor de humedad y temperatura DHT
 #define dhtSensorType DHT22     // Tipo de sensor DHT (DHT11 o DHT22)
 
+/**
+OPCIONAL
+    - Agrega en este espacio pines adicionales en caso de que los necesites.
+    - Puedes agregar tantos pines como necesites (o tenga tu placa).
+**/
+
+
+
+
 /**************************************************************
 CONFIGURACIÓN DE LOS ACTUADORES
     Descripción:
@@ -29,7 +38,6 @@ CONFIGURACIÓN DE LOS ACTUADORES
         - Para activar un actuador, establece un valor mayor a 0 en el pin del actuador,
         donde el valor representa el número de pin utilizado por el actuador.
 **************************************************************/
-#define pump_enabled true // DESACTIVAR (false) SOLO PARA PRUEBAS
 #define pumpEnaPin 6      // Pin utilizado para la bomba de agua
 #define pumpIn1Pin 7      // Pin utilizado para la bomba de agua (definido)
 #define pumpIn2Pin 8      // Pin utilizado para la bomba de agua (definido)
@@ -71,12 +79,13 @@ CONFIGURACIÓN DE LOS TOPICS MQTT
     Instrucciones:
         Completa los campos con los datos correspondientes a tu broker MQTT.
 **************************************************************/
+
+// los topicos de sensores deben comensar con "sensors/", los de actuadores con "actuators/" y los de logs con "logs/"
 #define mqtt_topic_water_level "sensor/water_level"             // Topic MQTT para el sensor de nivel de agua
 #define mqtt_topic_turbidity "sensor/turbidity"                 // Topic MQTT para el sensor de turbidez
 #define mqtt_topic_water_temperature "sensor/water_temperature" // Topic MQTT para el sensor de temperatura del agua
 #define mqtt_topic_tds "sensor/tds"                             // Topic MQTT para el sensor de TDS (Total Dissolved Solids)
-#define mqtt_topic_dht_temperature "sensor/ambient_temperature" // Topic MQTT para el sensor de DHT (temperatura ambiente)
-#define mqtt_topic_dht_humidity "sensor/ambient_humidity"       // Topic MQTT para el sensor de DHT (humedad ambiente)
+#define mqtt_topic_dht "sensor/dht" // Topic MQTT para el sensor de DHT (temperatura ambiente)
 
 #define mqtt_topic_pump "actuator/pump"                         // Topic MQTT para la bomba de agua
 
@@ -94,4 +103,4 @@ CONFIGURACIÓN DEL REGISTRO (LOGS)
 // #define log_port 80              // Puerto del servidor de registro
 // #define log_path "/api/log"      // Ruta del servidor de registro
 // #define log_token ""             // Token de autenticación para el servidor de registro
-/*****************************************************************/
+/*************************************************************/
