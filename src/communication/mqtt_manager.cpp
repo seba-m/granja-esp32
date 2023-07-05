@@ -251,9 +251,7 @@ void MqttManager::notify(char *topic, byte *payload, unsigned int length)
         return;
     }
 
-    String type = fields["type"];
     String name = fields["name"];
-
     Device *device = getDevice(name);
 
     if (device == nullptr)

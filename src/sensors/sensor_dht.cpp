@@ -169,7 +169,14 @@ void DHTSensor::update(StaticJsonDocument<200> value)
         doc["pin"] = this->getPin();
         doc["name"] = this->getDeviceName();
         doc["type"] = this->getSensorType();
+        doc["enabled"] = this->isEnabled();
+        doc["humidity"] = getValue("humidity");
+        doc["temperature"] = getValue("temperature");
         mqttManager.publish(mqtt_topic_dht, doc);
+    }
+    else if (log_enabled)
+    {
+        Serial.println("Invalid command " + String(command));
     }
     // TODO: add other commands
 }

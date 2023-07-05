@@ -11,7 +11,6 @@ class PumpController : public Actuator
     public:
         PumpController();
         void setup(int ena = -1, int in1 = -1, int in2 = -1, String name = "pump");
-        void loop();
         void turnOn(int seconds = 10) override;
         void turnOff() override;
         void update(StaticJsonDocument<200> doc) override;

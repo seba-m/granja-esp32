@@ -158,14 +158,16 @@ void MeasureTDS::update(StaticJsonDocument<200> value)
     }
 
     const char *command = value["command"];
-    
-    if (command == "enable")
+
+    if (strcmp(command, "enable") == 0)
     {
         this->enable();
-    } else if (command == "disable")
+    }
+    else if (strcmp(command, "disable") == 0)
     {
         this->disable();
-    } else if (command == "set_pin")
+    }
+    else if (strcmp(command, "set_pin") == 0)
     {
         int pin = value["pin"];
         this->setPin(pin);
@@ -178,10 +180,24 @@ void MeasureTDS::update(StaticJsonDocument<200> value)
         }
 
         pinMode(this->getPin(), INPUT);
-    } else if (command == "set_name")
+    }
+    else if (strcmp(command, "set_name") == 0)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
+    }
+    else if (strcmp(command, "get_status") == 0)
+    {
+        StaticJsonDocument<200> doc;
+        doc["type"] = "sensor";
+        doc["sensor"] = "tds";
+        doc["status"] = this->getStatus();
+        doc["pin"] = this->getPin();
+        doc["name"] = this->getDeviceName();
+        doc["type"] = this->getSensorType();
+        doc["enabled"] = this->isEnabled();
+        doc["tds"] = getValue("tds");
+        mqttManager.publish(mqtt_topic_tds, doc);
     }
     //TODO: add other commands
 }

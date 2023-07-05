@@ -27,11 +27,25 @@ class Actuator : public Device
         void setPins(std::map<int, String> pins)
         {
             this->pins = pins;
-            setValidPins(
-                pins.size() > 0 &&
-                std::all_of(
-                    pins.begin(), pins.end(), [](std::pair<int, String> pin)
-                    { return pin.first > -1; }));
+
+            bool isValid = false;
+
+            bool size = pins.size() > 0;
+
+            bool invalidPin = false;
+
+            for (std::pair<int, String> pin : pins)
+            {
+                if (pin.first < 0 || pin.first > 40)
+                {
+                    invalidPin = true;
+                    break;
+                }
+            }
+
+            isValid = size && !invalidPin;
+
+            setValidPins(isValid);
         }
 
         std::map<int, String> getPins()

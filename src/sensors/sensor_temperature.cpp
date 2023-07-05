@@ -1,6 +1,7 @@
 #include <sensors/sensor_temperature.h>
 
-TemperatureSensor::TemperatureSensor(MqttManager &manager) : mqttManager(manager), Sensor() {
+TemperatureSensor::TemperatureSensor(MqttManager &manager) : mqttManager(manager), Sensor()
+{
 }
 
 void TemperatureSensor::setup(int pin, String name)
@@ -112,18 +113,20 @@ void TemperatureSensor::update(StaticJsonDocument<200> value)
     }
 
     const char *command = value["command"];
-    
-    if (command == "enable")
+
+    if (strcmp(command, "enable") == 0)
     {
         this->enable();
-    } else if (command == "disable")
+    }
+    else if (strcmp(command, "disable") == 0)
     {
         this->disable();
-    } else if (command == "set_pin")
+    }
+    else if (strcmp(command, "set_pin") == 0)
     {
         int pin = value["pin"];
         this->setPin(pin);
-        //TODO: check if pin wont be used by other sensor
+        // TODO: check if pin wont be used by other sensor
 
         if (!isValidPins())
         {
@@ -131,18 +134,32 @@ void TemperatureSensor::update(StaticJsonDocument<200> value)
                 Serial.println("Invalid pins");
             return;
         }
-        
+
         ds.~OneWire();
         ds = OneWire(this->getPin());
         sensors.setOneWire(&ds);
         sensors.begin();
-    } else if (command == "set_name")
+    }
+    else if (strcmp(command, "set_name") == 0)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
-    } else {
-        if (log_enabled)
-            Serial.println("Invalid command" + String(command));
     }
-    //TODO: add other commands
+    else if (strcmp(command, "get_status") == 0)
+    {
+        StaticJsonDocument<200> doc;
+        doc["type"] = "sensor";
+        doc["sensor"] = "water_temperature";
+        doc["status"] = this->getStatus();
+        doc["pin"] = this->getPin();
+        doc["name"] = this->getDeviceName();
+        doc["enabled"] = this->isEnabled();
+        doc["temperature"] = getValue("temperature");
+        mqttManager.publish(mqtt_topic_water_temperature, doc);
+    }
+    else if (log_enabled)
+    {
+        Serial.println("Invalid command " + String(command));
+    }
+    // TODO: add other commands
 }

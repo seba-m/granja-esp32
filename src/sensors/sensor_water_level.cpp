@@ -1,6 +1,7 @@
 #include <sensors/sensor_water_level.h>
 
-WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager), Sensor() {
+WaterLevelSensor::WaterLevelSensor(MqttManager &manager) : mqttManager(manager), Sensor()
+{
 }
 
 void WaterLevelSensor::setup(int pin, String deviceName)
@@ -100,15 +101,15 @@ void WaterLevelSensor::update(StaticJsonDocument<200> value)
 
     const char *command = value["command"];
 
-    if (command == "enable")
+    if (strcmp(command, "enable") == 0)
     {
         this->enable();
     }
-    else if (command == "disable")
+    else if (strcmp(command, "disable") == 0)
     {
         this->disable();
     }
-    else if (command == "set_pin")
+    else if (strcmp(command, "set_pin") == 0)
     {
         int pin = value["pin"];
         // TODO: check if pin wont be used by other sensor
@@ -120,13 +121,29 @@ void WaterLevelSensor::update(StaticJsonDocument<200> value)
                 Serial.println("Invalid pins");
             return;
         }
-        
+
         pinMode(this->getPin(), INPUT);
     }
-    else if (command == "set_name")
+    else if (strcmp(command, "set_name") == 0)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
+    }
+    else if (strcmp(command, "get_status") == 0)
+    {
+        StaticJsonDocument<200> doc;
+        doc["type"] = "sensor";
+        doc["sensor"] = "water_level";
+        doc["status"] = this->getStatus();
+        doc["pin"] = this->getPin();
+        doc["name"] = this->getDeviceName();
+        doc["enabled"] = this->isEnabled();
+        doc["water_level"] = getValue("water_level");
+        mqttManager.publish(mqtt_topic_water_level, doc);
+    }
+    else if (log_enabled)
+    {
+        Serial.println("Invalid command " + String(command));
     }
     // TODO: add other commands
 }

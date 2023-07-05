@@ -41,6 +41,7 @@ void setup()
     mqttManager.attach(&waterLevelSensor);
     mqttManager.attach(&turbiditySensor);
     mqttManager.attach(&temperatureSensor);
+    mqttManager.attach(&controller);
 
     mqttManager.attach(&waterLevelSensor2);
     mqttManager.attach(&waterLevelSensor3);
@@ -79,7 +80,4 @@ void loop()
 
     waterLevelSensor2.loop();
     waterLevelSensor3.loop();
-
-    // actuator loop
-    controller.loop();
 }

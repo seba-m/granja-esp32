@@ -17,17 +17,6 @@ void PumpController::setup(int ena, int in1, int in2, String name)
     }
 }
 
-void PumpController::loop()
-{
-    if (!isEnabled() || !isValidPins())
-        return;
-
-    if (on)
-    {
-        turnOn(timeInSeconds);
-    }
-}
-
 void PumpController::turnOn(int seconds)
 {
     if (on || !isEnabled() || !isValidPins())
@@ -70,24 +59,24 @@ void PumpController::update(StaticJsonDocument<200> value)
 
     const char *command = value["command"];
 
-    if (command == "enable")
+    if (strcmp(command, "enable") == 0)
     {
         this->enable();
     }
-    else if (command == "disable")
+    else if (strcmp(command, "disable") == 0)
     {
         this->disable();
     }
-    else if (command == "turn_on")
+    else if (strcmp(command, "turn_on") == 0)
     {
         int time = value["time"];
         this->turnOn(time);
     }
-    else if (command == "turn_off")
+    else if (strcmp(command, "turn_off") == 0)
     {
         this->turnOff();
     }
-    else if (command == "set_pin")
+    else if (strcmp(command, "set_pin") == 0)
     {
         JsonObject pins = value["pins"];
 
@@ -101,13 +90,19 @@ void PumpController::update(StaticJsonDocument<200> value)
 
         this->setPins(pinValues);
     }
-    else if (command == "set_name")
+    else if (strcmp(command, "set_name") == 0)
     {
         const char *topic = value["new_name"];
         this->setDeviceName(topic);
-    } else if (command == "set_speed") {
+    }
+    else if (strcmp(command, "set_speed") == 0)
+    {
         int percentage = value["percentage"];
         this->setSpeedPercentage(percentage);
+    }
+    else if (log_enabled)
+    {
+        Serial.println("Invalid command " + String(command));
     }
 }
 
