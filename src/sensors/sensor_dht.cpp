@@ -140,6 +140,20 @@ void DHTSensor::update(StaticJsonDocument<200> value)
         int pin = value["pin"];
         this->setPin(pin);
         // TODO: check if pin wont be used by other sensor
+
+        if (!isValidPins())
+        {
+            if (log_enabled)
+                Serial.println("Invalid pins");
+            this->setStatus(SensorStatus::InvalidPins);
+            return;
+        }
+
+        if (dht != nullptr)
+            delete dht;
+
+        dht = new DHT(this->getPin(), this->getSensorType());
+        dht->begin();
     }
     else if (strcmp(command, "set_name") == 0)
     {

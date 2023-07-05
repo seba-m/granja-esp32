@@ -17,7 +17,7 @@ void TemperatureSensor::setup(int pin, String name)
         return;
     }
 
-    ds = OneWire(temperatureSensorPin);
+    ds = OneWire(this->getPin());
     sensors.setOneWire(&ds);
     sensors.begin();
     this->setStatus(SensorStatus::OkSetup);
@@ -124,6 +124,18 @@ void TemperatureSensor::update(StaticJsonDocument<200> value)
         int pin = value["pin"];
         this->setPin(pin);
         //TODO: check if pin wont be used by other sensor
+
+        if (!isValidPins())
+        {
+            if (log_enabled)
+                Serial.println("Invalid pins");
+            return;
+        }
+        
+        ds.~OneWire();
+        ds = OneWire(this->getPin());
+        sensors.setOneWire(&ds);
+        sensors.begin();
     } else if (command == "set_name")
     {
         const char *topic = value["new_name"];

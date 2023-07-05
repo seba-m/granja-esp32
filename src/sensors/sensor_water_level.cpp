@@ -17,7 +17,7 @@ void WaterLevelSensor::setup(int pin, String deviceName)
         return;
     }
 
-    pinMode(waterLevelSensorPin, INPUT);
+    pinMode(this->getPin(), INPUT);
     this->setStatus(SensorStatus::OkSetup);
 }
 
@@ -77,7 +77,7 @@ void WaterLevelSensor::readSensorValue()
         return;
     }
 
-    int liquidLevel = digitalRead(waterLevelSensorPin);
+    int liquidLevel = digitalRead(this->getPin());
 
     if (log_enabled)
     {
@@ -111,8 +111,17 @@ void WaterLevelSensor::update(StaticJsonDocument<200> value)
     else if (command == "set_pin")
     {
         int pin = value["pin"];
-        this->setPin(pin);
         // TODO: check if pin wont be used by other sensor
+        this->setPin(pin);
+
+        if (!isValidPins())
+        {
+            if (log_enabled)
+                Serial.println("Invalid pins");
+            return;
+        }
+        
+        pinMode(this->getPin(), INPUT);
     }
     else if (command == "set_name")
     {

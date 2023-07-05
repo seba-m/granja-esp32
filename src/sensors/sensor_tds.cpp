@@ -17,7 +17,7 @@ void MeasureTDS::setup(int pin, String name)
         return;
     }
 
-    pinMode(tdsSensorPin, INPUT);
+    pinMode(this->getPin(), INPUT);
     this->setStatus(SensorStatus::OkSetup);
 }
 
@@ -88,7 +88,7 @@ void MeasureTDS::readAnalogValue(unsigned int timeout)
 {
     if (millis() - analogSampleTimepoint > timeout)
     {
-        analogBuffer[analogBufferIndex] = analogRead(tdsSensorPin);
+        analogBuffer[analogBufferIndex] = analogRead(this->getPin());
         analogBufferIndex++;
         if (analogBufferIndex == SCOUNT)
             analogBufferIndex = 0;
@@ -170,6 +170,14 @@ void MeasureTDS::update(StaticJsonDocument<200> value)
         int pin = value["pin"];
         this->setPin(pin);
         //TODO: check if pin wont be used by other sensor
+
+        if (!isValidPins()){
+            if (log_enabled)
+                Serial.println("Invalid pins");
+            return;
+        }
+
+        pinMode(this->getPin(), INPUT);
     } else if (command == "set_name")
     {
         const char *topic = value["new_name"];

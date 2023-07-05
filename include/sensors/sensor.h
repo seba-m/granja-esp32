@@ -23,7 +23,15 @@ class Sensor : public Device
 
         float getValue(String type)
         {
-            return values[type] ? values[type] : NAN;
+            if (values.count(type) > 0)
+            {
+                float value = values[type];
+                return isnan(value) ? NAN : value;
+            }
+            else
+            {
+                return 0.0;
+            }
         }
 
         void setStatus(SensorStatus status)
