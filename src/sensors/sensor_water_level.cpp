@@ -58,10 +58,10 @@ void WaterLevelSensor::publish()
     float level = getValue("water_level");
 
     StaticJsonDocument<200> doc;
-    doc["type"] = "sensor";
-    doc["sensor"] = this->getDeviceName();
-    doc[this->getDeviceName()] = level;
-    doc["status"] = this->getStatus();
+    JsonObject obj = doc.createNestedObject("sensor");
+    obj["name"] = this->getDeviceName();
+    obj["water_level"] = level;
+    obj["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_water_level, doc);
 }
@@ -132,13 +132,15 @@ void WaterLevelSensor::update(StaticJsonDocument<200> value)
     else if (strcmp(command, "get_status") == 0)
     {
         StaticJsonDocument<200> doc;
-        doc["type"] = "sensor";
-        doc["sensor"] = "water_level";
-        doc["status"] = this->getStatus();
-        doc["pin"] = this->getPin();
-        doc["name"] = this->getDeviceName();
-        doc["enabled"] = this->isEnabled();
-        doc["water_level"] = getValue("water_level");
+        JsonObject obj = doc.createNestedObject("sensor");
+
+        obj["name"] = this->getDeviceName();
+        obj["water_level"] = getValue("water_level");
+        obj["status"] = this->getStatus();
+        obj["pin"] = this->getPin();
+        obj["type"] = this->getSensorType();
+        obj["enabled"] = this->isEnabled();
+
         mqttManager.publish(mqtt_topic_water_level, doc);
     }
     else if (log_enabled)

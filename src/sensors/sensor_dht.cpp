@@ -67,11 +67,11 @@ void DHTSensor::publish()
     float temperature = getValue("temperature");
 
     StaticJsonDocument<200> doc;
-    doc["type"] = "sensor";
-    doc["sensor"] = this->getDeviceName();
-    doc[this->getDeviceName() + "_humidity"] = humidity;
-    doc[this->getDeviceName() + "_temperature"] = temperature;
-    doc["status"] = this->getStatus();
+    JsonObject obj = doc.createNestedObject("sensor");
+    obj["name"] = this->getDeviceName();
+    obj["dht_humidity"] = humidity;
+    obj["dht_temperature"] = temperature;
+    obj["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_dht, doc);
 }
@@ -163,15 +163,15 @@ void DHTSensor::update(StaticJsonDocument<200> value)
     else if (strcmp(command, "get_status") == 0)
     {
         StaticJsonDocument<200> doc;
-        doc["type"] = "sensor";
-        doc["sensor"] = "dht";
-        doc["status"] = this->getStatus();
-        doc["pin"] = this->getPin();
-        doc["name"] = this->getDeviceName();
-        doc["type"] = this->getSensorType();
-        doc["enabled"] = this->isEnabled();
-        doc["humidity"] = getValue("humidity");
-        doc["temperature"] = getValue("temperature");
+        JsonObject obj = doc.createNestedObject("sensor");
+        obj["name"] = this->getDeviceName();
+        obj["dht_humidity"] = getValue("humidity");
+        obj["dht_temperature"] = getValue("temperature");
+        obj["status"] = this->getStatus();
+        obj["pin"] = this->getPin();
+        obj["type"] = this->getSensorType();
+        obj["enabled"] = this->isEnabled();
+
         mqttManager.publish(mqtt_topic_dht, doc);
     }
     else if (log_enabled)

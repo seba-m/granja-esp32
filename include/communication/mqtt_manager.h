@@ -26,6 +26,7 @@ class MqttManager : public Subject
         void setup();
         void loop();
         void publish(const char *topic, StaticJsonDocument<200> &message);
+        void report(const char *topic, StaticJsonDocument<200> &message);
         void attach(Device *device) override;
         void detach(Device *device) override;
         void notify(char *topic, byte *payload, unsigned int length) override;

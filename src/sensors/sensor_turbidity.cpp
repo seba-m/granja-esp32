@@ -61,10 +61,10 @@ void TurbiditySensor::publish()
     }
 
     StaticJsonDocument<200> doc;
-    doc["type"] = "sensor";
-    doc["sensor"] = this->getDeviceName();
-    doc[this->getDeviceName()] = turbidity;
-    doc["status"] = this->getStatus();
+    JsonObject obj = doc.createNestedObject("sensor");
+    obj["name"] = this->getDeviceName();
+    obj["turbidity"] = turbidity;
+    obj["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_turbidity, doc);
 }
@@ -132,13 +132,15 @@ void TurbiditySensor::update(StaticJsonDocument<200> value)
     } else if (strcmp(command, "get_status") == 0)
     {
         StaticJsonDocument<200> doc;
-        doc["type"] = "sensor";
-        doc["sensor"] = "turbidity";
-        doc["status"] = this->getStatus();
-        doc["pin"] = this->getPin();
-        doc["name"] = this->getDeviceName();
-        doc["enabled"] = this->isEnabled();
-        doc["turbidity"] = getValue("turbidity");
+        JsonObject obj = doc.createNestedObject("sensor");
+
+        obj["name"] = this->getDeviceName();
+        obj["turbidity"] = getValue("turbidity");
+        obj["status"] = this->getStatus();
+        obj["pin"] = this->getPin();
+        obj["type"] = this->getSensorType();
+        obj["enabled"] = this->isEnabled();
+
         mqttManager.publish(mqtt_topic_turbidity, doc);
     }
     else if (log_enabled)

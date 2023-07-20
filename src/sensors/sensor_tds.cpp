@@ -76,10 +76,10 @@ void MeasureTDS::publish()
     }
 
     StaticJsonDocument<200> doc;
-    doc["type"] = "sensor";
-    doc["sensor"] = this->getDeviceName();
-    doc[this->getDeviceName()] = tdsValue;
-    doc["status"] = this->getStatus();
+    JsonObject obj = doc.createNestedObject("sensor");
+    obj["name"] = this->getDeviceName();
+    obj["tds"] = tdsValue;
+    obj["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_tds, doc);
 }
@@ -189,14 +189,15 @@ void MeasureTDS::update(StaticJsonDocument<200> value)
     else if (strcmp(command, "get_status") == 0)
     {
         StaticJsonDocument<200> doc;
-        doc["type"] = "sensor";
-        doc["sensor"] = "tds";
-        doc["status"] = this->getStatus();
-        doc["pin"] = this->getPin();
-        doc["name"] = this->getDeviceName();
-        doc["type"] = this->getSensorType();
-        doc["enabled"] = this->isEnabled();
-        doc["tds"] = getValue("tds");
+        JsonObject obj = doc.createNestedObject("sensor");
+
+        obj["name"] = this->getDeviceName();
+        obj["tds"] = getValue("tds");
+        obj["status"] = this->getStatus();
+        obj["pin"] = this->getPin();
+        obj["type"] = this->getSensorType();
+        obj["enabled"] = this->isEnabled();
+
         mqttManager.publish(mqtt_topic_tds, doc);
     }
     //TODO: add other commands

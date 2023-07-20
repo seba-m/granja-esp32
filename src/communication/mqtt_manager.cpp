@@ -37,6 +37,46 @@ void MqttManager::publish(const char *topic, StaticJsonDocument<200> &doc)
         return;
     }
 
+    if (doc.containsKey("sensor"))
+    {
+        JsonObject obj = doc["sensor"];
+        obj["device-id"] = espId;
+    }
+    else if (doc.containsKey("actuator"))
+    {
+        JsonObject obj = doc["actuator"];
+        obj["device-id"] = espId;
+    } else {
+        return;
+    }
+
+    char buffer[200];
+    serializeJson(doc, buffer);
+    client.publish(topic, buffer);
+}
+
+void MqttManager::report(const char *topic, StaticJsonDocument<200> &doc)
+{
+    if (!isValidMqtt())
+    {
+        return;
+    }
+
+    if (doc.containsKey("sensor"))
+    {
+        JsonObject obj = doc["sensor"];
+        obj["device_id"] = espId;
+    }
+    else if (doc.containsKey("actuator"))
+    {
+        JsonObject obj = doc["actuator"];
+        obj["device_id"] = espId;
+    }
+    else
+    {
+        return;
+    }
+
     char buffer[200];
     serializeJson(doc, buffer);
     client.publish(topic, buffer);

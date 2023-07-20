@@ -60,10 +60,10 @@ void TemperatureSensor::publish()
     float temp = getValue("temperature");
 
     StaticJsonDocument<200> doc;
-    doc["type"] = "sensor";
-    doc["sensor"] = this->getDeviceName();
-    doc[this->getDeviceName()] = temp;
-    doc["status"] = this->getStatus();
+    JsonObject obj = doc.createNestedObject("sensor");
+    obj["name"] = this->getDeviceName();
+    obj["temperature"] = temp;
+    obj["status"] = this->getStatus();
 
     mqttManager.publish(mqtt_topic_water_temperature, doc);
 }
@@ -148,13 +148,15 @@ void TemperatureSensor::update(StaticJsonDocument<200> value)
     else if (strcmp(command, "get_status") == 0)
     {
         StaticJsonDocument<200> doc;
-        doc["type"] = "sensor";
-        doc["sensor"] = "water_temperature";
-        doc["status"] = this->getStatus();
-        doc["pin"] = this->getPin();
-        doc["name"] = this->getDeviceName();
-        doc["enabled"] = this->isEnabled();
-        doc["temperature"] = getValue("temperature");
+        JsonObject obj = doc.createNestedObject("sensor");
+
+        obj["name"] = this->getDeviceName();
+        obj["temperature"] = getValue("temperature");
+        obj["status"] = this->getStatus();
+        obj["pin"] = this->getPin();
+        obj["type"] = this->getSensorType();
+        obj["enabled"] = this->isEnabled();
+
         mqttManager.publish(mqtt_topic_water_temperature, doc);
     }
     else if (log_enabled)
